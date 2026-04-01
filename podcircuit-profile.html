@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Create Your Profile — PodCircuit</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--ink:#0e0c0a;--paper:#f5f0e8;--cream:#ede7d9;--gold:#c9a84c;--gold-lt:#f0d98a;--teal:#1a6b6b;--teal-lt:#e8f4f4;--muted:#7a7060;--border:#d8d0c0;--red:#c0392b;--green:#1a7a3c}
+body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);min-height:100vh}
+.topbar{background:var(--ink);border-bottom:2px solid var(--gold);height:62px;padding:0 36px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.25rem;color:var(--paper);text-decoration:none;display:flex;align-items:center;gap:8px}
+.logo-dot{width:8px;height:8px;background:var(--gold);border-radius:50%;animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.nav-right{display:flex;gap:10px;align-items:center}
+.nbtn{background:transparent;border:1px solid #3a3530;color:#aaa;padding:7px 15px;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:.82rem;cursor:pointer;transition:all .2s;text-decoration:none;display:inline-block}
+.nbtn:hover{border-color:#888;color:#eee}
+.screen{display:none}.screen.show{display:block}
+.auth-bg{min-height:calc(100vh - 62px);background:var(--ink);display:flex;align-items:center;justify-content:center;padding:40px 20px}
+.auth-box{width:100%;max-width:400px;background:#1a1714;border:1.5px solid #2a2520;border-radius:16px;overflow:hidden}
+.auth-head{padding:30px 30px 20px;text-align:center;border-bottom:1px solid #2a2520}
+.auth-head h2{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;color:var(--paper);margin-bottom:5px}
+.auth-head p{color:#666;font-size:.82rem;font-weight:300}
+.auth-sw{display:flex;background:#111;border-radius:7px;padding:4px;margin:16px 30px 0}
+.atab{flex:1;padding:9px;border:none;background:transparent;color:#555;font-family:'Syne',sans-serif;font-weight:700;font-size:.78rem;cursor:pointer;border-radius:5px;transition:all .2s}
+.atab.on{background:var(--gold);color:var(--ink)}
+.auth-body{padding:24px 30px 28px}
+.af{margin-bottom:13px}
+.af label{display:block;font-size:.75rem;font-weight:600;color:#888;margin-bottom:5px}
+.af input{width:100%;background:#111;border:1.5px solid #2a2520;color:var(--paper);padding:11px 13px;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:.88rem;outline:none;transition:border-color .2s}
+.af input:focus{border-color:var(--gold)}
+.af input::placeholder{color:#333}
+.acta{width:100%;background:var(--gold);color:var(--ink);border:none;padding:13px;border-radius:7px;font-family:'Syne',sans-serif;font-weight:800;font-size:.88rem;cursor:pointer;margin-top:4px;transition:background .2s}
+.acta:hover{background:var(--gold-lt)}
+.anote{font-size:.75rem;text-align:center;margin-top:10px;min-height:16px}
+.anote.err{color:#e07060}.anote.ok{color:#5dab6e}
+.dwrap{max-width:800px;margin:0 auto;padding:44px 24px 80px}
+.dhello{font-family:'Syne',sans-serif;font-weight:800;font-size:1.7rem;letter-spacing:-.5px;margin-bottom:4px}
+.dsub{color:var(--muted);font-size:.88rem;font-weight:300;margin-bottom:26px}
+.sband{display:flex;align-items:center;gap:15px;padding:17px 20px;border-radius:11px;border:1.5px solid;margin-bottom:24px}
+.sband.draft{background:var(--cream);border-color:var(--border)}
+.sband.pending{background:#fdf6e3;border-color:#e8d08a}
+.sband.approved{background:#edf7f0;border-color:#8ecba0}
+.sband.rejected{background:#fdf0ed;border-color:#e8a898}
+.sbi{font-size:1.7rem;flex-shrink:0}
+.sbt{font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;margin-bottom:3px}
+.sband.draft .sbt{color:var(--muted)}.sband.pending .sbt{color:#9a6a10}
+.sband.approved .sbt{color:var(--green)}.sband.rejected .sbt{color:var(--red)}
+.sbd{font-size:.79rem;color:var(--muted);font-weight:300;line-height:1.5}
+.pcard{background:#fff;border:1.5px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:22px}
+.pctop{background:var(--ink);padding:24px 24px 18px;display:flex;align-items:flex-start;gap:15px}
+.pcav{width:66px;height:66px;border-radius:50%;border:2.5px solid var(--gold);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;color:var(--gold);background:rgba(201,168,76,.1);flex-shrink:0;overflow:hidden}
+.pcav img{width:100%;height:100%;object-fit:cover}
+.pcname{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--paper);margin-bottom:3px}
+.pctitle{color:#aaa;font-size:.8rem;font-weight:300;margin-bottom:8px}
+.pctags{display:flex;flex-wrap:wrap;gap:5px}
+.pctag{background:rgba(26,107,107,.2);border:1px solid rgba(26,107,107,.35);color:#4db8b8;font-size:.7rem;font-weight:600;padding:2px 9px;border-radius:9px}
+.pcbody{padding:18px 24px}
+.pcstory{font-size:.85rem;color:#555;line-height:1.65;font-weight:300;margin-bottom:12px}
+.pcstory.empty{color:#bbb;font-style:italic}
+.pcpts{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+.pcpt{display:flex;gap:7px;font-size:.81rem;color:#444}
+.pcptd{color:var(--gold);flex-shrink:0;margin-top:2px}
+.pcsoc{display:flex;flex-wrap:wrap;gap:12px;padding-top:12px;border-top:1px solid var(--cream)}
+.pcsoci{font-size:.77rem;color:var(--muted);display:flex;align-items:center;gap:5px}
+.pcscn{font-family:'Syne',sans-serif;font-weight:700;font-size:.86rem;color:var(--teal)}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:11px 22px;border-radius:8px;font-family:'Syne',sans-serif;font-weight:700;font-size:.84rem;cursor:pointer;border:none;transition:all .18s}
+.btn-dk{background:var(--ink);color:var(--paper)}.btn-dk:hover{background:var(--teal)}
+.btn-gd{background:var(--gold);color:var(--ink)}.btn-gd:hover{background:var(--gold-lt)}
+.btn-ot{background:transparent;color:var(--muted);border:1.5px solid var(--border)}.btn-ot:hover{border-color:var(--ink);color:var(--ink)}
+.brow{display:flex;flex-wrap:wrap;gap:9px}
+.fwrap{max-width:660px;margin:0 auto;padding:40px 24px 110px}
+.fbk{background:none;border:none;color:var(--muted);font-size:.83rem;cursor:pointer;display:flex;align-items:center;gap:5px;margin-bottom:22px;padding:0;transition:color .2s}
+.fbk:hover{color:var(--ink)}
+.fh{font-family:'Syne',sans-serif;font-weight:800;font-size:1.65rem;letter-spacing:-.5px;margin-bottom:5px}
+.fs{color:var(--muted);font-size:.87rem;font-weight:300;margin-bottom:36px;line-height:1.5}
+.fsec{margin-bottom:32px}
+.fstit{font-family:'Syne',sans-serif;font-weight:700;font-size:.68rem;letter-spacing:1.8px;text-transform:uppercase;color:var(--muted);padding-bottom:9px;border-bottom:1.5px solid var(--cream);margin-bottom:16px}
+.fld{margin-bottom:14px}
+.fld label{display:block;font-size:.77rem;font-weight:600;color:var(--ink);margin-bottom:5px}
+.req{color:var(--red);margin-left:2px}.opt{color:var(--muted);font-weight:400;font-size:.7rem;margin-left:4px}
+.fld input,.fld textarea,.fld select{width:100%;border:1.5px solid var(--border);background:#fff;padding:11px 14px;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:.87rem;color:var(--ink);outline:none;transition:border-color .2s,box-shadow .2s}
+.fld input:focus,.fld textarea:focus,.fld select:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(26,107,107,.07)}
+.fld input::placeholder,.fld textarea::placeholder{color:#bbb}
+.fld textarea{resize:vertical;min-height:96px;line-height:1.6}
+.fld select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237a7060' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center;padding-right:34px}
+.fhint{font-size:.71rem;color:var(--muted);margin-top:4px;font-weight:300}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.pdrop{border:2px dashed var(--border);border-radius:9px;padding:24px;text-align:center;cursor:pointer;position:relative;overflow:hidden;transition:border-color .2s,background .2s}
+.pdrop:hover{border-color:var(--gold);background:#fffdf7}
+.pdrop.loaded{border-color:var(--teal);background:var(--teal-lt)}
+.pdrop input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.pdrop-img{width:66px;height:66px;border-radius:50%;object-fit:cover;margin:0 auto 8px;border:2px solid var(--teal);display:none}
+.pdrop-ico{font-size:1.7rem;margin-bottom:6px}
+.pdrop-lbl{font-size:.79rem;font-weight:500;color:var(--ink);margin-bottom:2px}
+.pdrop-sub{font-size:.71rem;color:var(--muted)}
+.cgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.cchip{border:1.5px solid var(--border);border-radius:7px;padding:8px 10px;display:flex;align-items:center;gap:6px;cursor:pointer;font-size:.79rem;font-weight:500;color:var(--muted);transition:all .14s;user-select:none}
+.cchip:hover{border-color:var(--teal);color:var(--teal)}
+.cchip.on{background:var(--teal-lt);border-color:var(--teal);color:var(--teal);font-weight:600}
+.cchip input{display:none}
+.cck{width:14px;height:14px;border-radius:3px;border:1.5px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:.58rem;flex-shrink:0}
+.cchip.on .cck{background:var(--teal);border-color:var(--teal);color:#fff}
+.sblk{border:1.5px solid var(--border);border-radius:9px;overflow:hidden;margin-bottom:8px}
+.sblk-h{background:var(--cream);padding:9px 13px;display:flex;align-items:center;gap:7px;font-family:'Syne',sans-serif;font-weight:700;font-size:.79rem}
+.sblk-b{padding:12px 13px;display:grid;grid-template-columns:1fr 1fr;gap:10px;background:#fff}
+.tplist{display:flex;flex-direction:column;gap:7px;margin-bottom:8px}
+.tprow{display:flex;gap:7px;align-items:center}
+.tprow input{flex:1}
+.tpdel{width:33px;height:33px;flex-shrink:0;background:none;border:1.5px solid var(--border);border-radius:6px;cursor:pointer;color:var(--muted);font-size:.85rem;transition:all .15s;display:flex;align-items:center;justify-content:center}
+.tpdel:hover{border-color:var(--red);color:var(--red)}
+.addtp{background:transparent;border:1.5px dashed var(--border);color:var(--muted);padding:9px;width:100%;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:.81rem;cursor:pointer;transition:all .15s}
+.addtp:hover{border-color:var(--teal);color:var(--teal);background:var(--teal-lt)}
+.avgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.avopt{border:1.5px solid var(--border);border-radius:8px;padding:12px;text-align:center;cursor:pointer;transition:all .15s}
+.avopt input{display:none}
+.avico{font-size:1.2rem;margin-bottom:4px}
+.avlbl{font-family:'Syne',sans-serif;font-weight:700;font-size:.74rem;color:var(--ink)}
+.avsub{font-size:.65rem;color:var(--muted);margin-top:2px}
+.avopt.on{border-color:var(--teal);background:var(--teal-lt)}
+.avopt.on .avlbl{color:var(--teal)}
+.savebar{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1.5px solid var(--border);padding:13px 34px;display:flex;align-items:center;justify-content:space-between;z-index:50;box-shadow:0 -3px 14px rgba(0,0,0,.07)}
+.saveinfo{font-size:.77rem;color:var(--muted)}
+.saveinfo.saved{color:var(--green)}
+.sbtns{display:flex;gap:8px}
+.toast{position:fixed;bottom:74px;right:20px;padding:11px 17px;border-radius:9px;font-size:.83rem;font-weight:500;z-index:999;display:none;align-items:center;gap:8px;box-shadow:0 5px 18px rgba(0,0,0,.12);border:1.5px solid;animation:tup .3s ease}
+@keyframes tup{from{transform:translateY(10px);opacity:0}to{transform:translateY(0);opacity:1}}
+.toast.show{display:flex}
+.toast.ok{background:#edf7f0;border-color:#8ecba0;color:var(--green)}
+.toast.err{background:#fdf0ed;border-color:#e8a898;color:var(--red)}
+.toast.inf{background:var(--cream);border-color:var(--border);color:var(--ink)}
+@media(max-width:560px){
+  .topbar{padding:0 18px}.fwrap,.dwrap{padding:28px 16px 100px}
+  .frow,.sblk-b,.cgrid{grid-template-columns:1fr}.avgrid{grid-template-columns:1fr}
+  .savebar{padding:12px 16px}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="podcast-circuit.html" class="logo"><div class="logo-dot"></div>PodCircuit</a>
+  <div class="nav-right">
+    <a href="podcast-circuit.html" class="nbtn">Browse Guests</a>
+    <button class="nbtn" id="btnOut" style="display:none" onclick="logout()">Sign Out</button>
+  </div>
+</div>
+
+<!-- AUTH -->
+<div class="screen show" id="sAuth">
+  <div class="auth-bg">
+    <div class="auth-box">
+      <div class="auth-head">
+        <h2>🎙 Build Your Profile</h2>
+        <p>Get discovered by podcast producers looking for guests exactly like you</p>
+        <div class="auth-sw">
+          <button class="atab on" id="tabNew" onclick="authTab('new')">Create Account</button>
+          <button class="atab" id="tabIn" onclick="authTab('in')">Sign In</button>
+        </div>
+      </div>
+      <div class="auth-body">
+        <div id="fNew">
+          <div class="af"><label>Full Name</label><input id="rNm" type="text" placeholder="Marcus Bell"></div>
+          <div class="af"><label>Email</label><input id="rEm" type="email" placeholder="you@email.com"></div>
+          <div class="af"><label>Password</label><input id="rPw" type="password" placeholder="Min 6 characters" onkeydown="if(event.key==='Enter')reg()"></div>
+          <button class="acta" onclick="reg()">Create My Profile →</button>
+          <div class="anote" id="regMsg"></div>
+        </div>
+        <div id="fIn" style="display:none">
+          <div class="af"><label>Email</label><input id="lEm" type="email" placeholder="you@email.com"></div>
+          <div class="af"><label>Password</label><input id="lPw" type="password" placeholder="Your password" onkeydown="if(event.key==='Enter')login()"></div>
+          <button class="acta" onclick="login()">Sign In →</button>
+          <div class="anote" id="loginMsg"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="screen" id="sDash">
+  <div class="dwrap">
+    <div class="dhello" id="dHello">Welcome!</div>
+    <div class="dsub">Your PodCircuit profile. Edit anytime, submit when ready.</div>
+    <div class="sband draft" id="dBand">
+      <div class="sbi" id="dBI">📝</div>
+      <div><div class="sbt" id="dBT">Profile Draft</div><div class="sbd" id="dBD">Complete your info and submit for review.</div></div>
+    </div>
+    <div class="pcard">
+      <div class="pctop">
+        <div class="pcav" id="dAv">?</div>
+        <div>
+          <div class="pcname" id="dNm">Your Name</div>
+          <div class="pctitle" id="dTtl">Your title / tagline</div>
+          <div class="pctags" id="dTags"></div>
+        </div>
+      </div>
+      <div class="pcbody">
+        <div class="pcstory empty" id="dStory">No story added yet...</div>
+        <div id="dPW" style="display:none"><div class="pcpts" id="dPts"></div></div>
+        <div id="dSW" style="display:none"><div class="pcsoc" id="dSoc"></div></div>
+      </div>
+    </div>
+    <div class="brow">
+      <button class="btn btn-dk" onclick="go('sForm')">✏️ Edit Profile</button>
+      <button class="btn btn-gd" id="dSub" onclick="submitReview()">🚀 Submit for Review</button>
+    </div>
+  </div>
+</div>
+
+<!-- FORM -->
+<div class="screen" id="sForm">
+  <div class="fwrap">
+    <button class="fbk" onclick="go('sDash')">← Back to dashboard</button>
+    <div class="fh">Build Your Profile</div>
+    <div class="fs">Fill in your info below. Everything saves automatically. Come back and edit anytime.</div>
+
+    <div class="fsec">
+      <div class="fstit">👤 Basic Info</div>
+      <div class="fld">
+        <label>Profile Photo <span class="opt">(recommended)</span></label>
+        <div class="pdrop" id="pDrop">
+          <input type="file" accept="image/*" onchange="onPhoto(this)">
+          <img class="pdrop-img" id="pImg">
+          <div class="pdrop-ico" id="pIco">📸</div>
+          <div class="pdrop-lbl" id="pLbl">Click to upload your photo</div>
+          <div class="pdrop-sub">JPG or PNG · Square works best</div>
+        </div>
+      </div>
+      <div class="frow">
+        <div class="fld"><label>First Name <span class="req">*</span></label><input id="fFN" type="text" placeholder="Marcus" oninput="save()"></div>
+        <div class="fld"><label>Last Name <span class="req">*</span></label><input id="fLN" type="text" placeholder="Bell" oninput="save()"></div>
+      </div>
+      <div class="fld"><label>Title / Tagline <span class="req">*</span></label><input id="fTtl" type="text" placeholder='e.g. "Ex-NFL Player to Entrepreneur"' oninput="save()"><div class="fhint">First thing producers see — make it punchy.</div></div>
+      <div class="frow">
+        <div class="fld"><label>City <span class="req">*</span></label><input id="fCty" type="text" placeholder="Atlanta, GA" oninput="save()"></div>
+        <div class="fld"><label>Contact Email <span class="req">*</span></label><input id="fCEm" type="email" placeholder="you@email.com" oninput="save()"></div>
+      </div>
+      <div class="fld"><label>Website <span class="opt">(optional)</span></label><input id="fWeb" type="url" placeholder="https://yoursite.com" oninput="save()"></div>
+    </div>
+
+    <div class="fsec">
+      <div class="fstit">🏷️ Topic Categories</div>
+      <div class="cgrid" id="cgrid">
+        <label class="cchip" onclick="flipC(this)"><input type="checkbox" value="Business"><span class="cck">✓</span>Business</label>
+        <label class="cchip" onclick="flipC(this)"><input type="checkbox" value="Health"><span class="cck">✓</span>Health</label>
+        <label class="cchip" onclick="flipC(this)"><input type="checkbox" value="True Crime"><span class="cck">✓</span>True Crime</label>
+        <label class="cchip" onclick="flipC(this)"><input type="checkbox" value="Tech"><span class="cck">✓</span>Tech</label>
+        <label class="cchip" onclick="flipC(this)"><input type="checkbox" value="Finance"><span class="cck">✓</span>Finance</label>
+        <label class="cchip" onclick="flipC(this)"><input type="checkbox" value="Spirituality"><span class="cck">✓</span>Spirituality</label>
+        <label class="cchip" onclick="flipC(this)"><input type="checkbox" value="Sports"><span class="cck">✓</span>Sports</label>
+        <label class="cchip" onclick="flipC(this)"><input type="checkbox" value="Parenting"><span class="cck">✓</span>Parenting</label>
+        <label class="cchip" onclick="flipC(this)"><input type="checkbox" value="Politics"><span class="cck">✓</span>Politics</label>
+        <label class="cchip" onclick="flipC(this)"><input type="checkbox" value="Relationships"><span class="cck">✓</span>Relationships</label>
+        <label class="cchip" onclick="flipC(this)"><input type="checkbox" value="Entertainment"><span class="cck">✓</span>Entertainment</label>
+        <label class="cchip" onclick="flipC(this)"><input type="checkbox" value="Education"><span class="cck">✓</span>Education</label>
+      </div>
+    </div>
+
+    <div class="fsec">
+      <div class="fstit">📖 Your Story</div>
+      <div class="fld"><label>Full story <span class="req">*</span></label><textarea id="fSt" rows="6" placeholder="What you've been through, what you've built, what makes your story worth sharing. Be specific — real details are more compelling than vague summaries. Aim for 80–200 words." oninput="save();wc()"></textarea><div class="fhint" id="wcH">0 words · aim for 80–200</div></div>
+      <div class="fld"><label>Your turning point <span class="req">*</span></label><textarea id="fTp" rows="2" placeholder='One powerful sentence. e.g. "At 29 I walked out of prison with $40 and a plan."' oninput="save()"></textarea><div class="fhint">The moment everything changed.</div></div>
+      <div class="fld"><label>What you have built or achieved <span class="req">*</span></label><textarea id="fAc" rows="3" placeholder="Revenue, audience size, credentials — be specific. Numbers help." oninput="save()"></textarea></div>
+    </div>
+
+    <div class="fsec">
+      <div class="fstit">📱 Social Media</div>
+      <p style="font-size:.79rem;color:var(--muted);margin-bottom:13px;font-weight:300">Fill in the platforms you use. At least one is required.</p>
+      <div class="sblk"><div class="sblk-h"><span>📸</span>Instagram</div><div class="sblk-b"><div class="fld" style="margin:0"><label>Handle</label><input id="igH" type="text" placeholder="@handle" oninput="save()"></div><div class="fld" style="margin:0"><label>Followers</label><input id="igF" type="number" placeholder="284000" min="0" oninput="save()"></div></div></div>
+      <div class="sblk"><div class="sblk-h"><span>🎵</span>TikTok</div><div class="sblk-b"><div class="fld" style="margin:0"><label>Handle</label><input id="ttH" type="text" placeholder="@handle" oninput="save()"></div><div class="fld" style="margin:0"><label>Followers</label><input id="ttF" type="number" placeholder="1100000" min="0" oninput="save()"></div></div></div>
+      <div class="sblk"><div class="sblk-h"><span>▶️</span>YouTube</div><div class="sblk-b"><div class="fld" style="margin:0"><label>Channel URL</label><input id="ytU" type="url" placeholder="youtube.com/@channel" oninput="save()"></div><div class="fld" style="margin:0"><label>Subscribers</label><input id="ytS" type="number" placeholder="98000" min="0" oninput="save()"></div></div></div>
+      <div class="sblk"><div class="sblk-h"><span>🐦</span>X / Twitter</div><div class="sblk-b"><div class="fld" style="margin:0"><label>Handle</label><input id="twH" type="text" placeholder="@handle" oninput="save()"></div><div class="fld" style="margin:0"><label>Followers</label><input id="twF" type="number" placeholder="42000" min="0" oninput="save()"></div></div></div>
+      <div class="sblk"><div class="sblk-h"><span>💼</span>LinkedIn</div><div class="sblk-b"><div class="fld" style="margin:0"><label>Profile URL</label><input id="liU" type="url" placeholder="linkedin.com/in/you" oninput="save()"></div><div class="fld" style="margin:0"><label>Followers</label><input id="liF" type="number" placeholder="12000" min="0" oninput="save()"></div></div></div>
+    </div>
+
+    <div class="fsec">
+      <div class="fstit">🎤 Talking Points</div>
+      <p style="font-size:.79rem;color:var(--muted);margin-bottom:12px;font-weight:300">Topics you can cover — give producers ready-made episode ideas. Up to 6.</p>
+      <div class="tplist" id="tpList"><div class="tprow"><input type="text" placeholder='e.g. "What NFL locker rooms taught me about leadership"' oninput="save()"></div></div>
+      <button class="addtp" onclick="addTp()">+ Add talking point</button>
+    </div>
+
+    <div class="fsec">
+      <div class="fstit">📅 Availability and Preferences</div>
+      <div class="fld">
+        <label>Booking status</label>
+        <div class="avgrid">
+          <label class="avopt on" onclick="pickAv(this,'available')"><input type="radio" name="av" value="available"><div class="avico">🟢</div><div class="avlbl">Available</div><div class="avsub">Open now</div></label>
+          <label class="avopt" onclick="pickAv(this,'limited')"><input type="radio" name="av" value="limited"><div class="avico">🟡</div><div class="avlbl">Limited</div><div class="avsub">Selective</div></label>
+          <label class="avopt" onclick="pickAv(this,'waitlist')"><input type="radio" name="av" value="waitlist"><div class="avico">🔴</div><div class="avlbl">Waitlisted</div><div class="avsub">Not now</div></label>
+        </div>
+      </div>
+      <div class="frow">
+        <div class="fld"><label>Interview format</label><select id="fFmt" onchange="save()"><option value="both">Remote or In-person</option><option value="remote">Remote only</option><option value="inperson">In-person only</option></select></div>
+        <div class="fld"><label>Prior podcast experience</label><select id="fExp" onchange="save()"><option value="never">First time</option><option value="few">A few (1-5)</option><option value="regular">Regular (6-20)</option><option value="veteran">Veteran (20+)</option></select></div>
+      </div>
+      <div class="fld"><label>Prior interview clip <span class="opt">(optional)</span></label><input id="fClp" type="url" placeholder="https://youtube.com/watch?v=..." oninput="save()"></div>
+    </div>
+  </div>
+
+  <div class="savebar">
+    <div class="saveinfo" id="sInfo">All changes saved</div>
+    <div class="sbtns">
+      <button class="btn btn-ot" onclick="go('sDash')">View Dashboard</button>
+      <button class="btn btn-gd" onclick="doSave();go('sDash')">Save and Continue</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toastEl"></div>
+
+<script>
+let CU=null,ph=null,av='available',sT=null;
+const gdb=()=>{try{return JSON.parse(localStorage.getItem('pc_db')||'{}')}catch(e){return{}}};
+const sdb=d=>localStorage.setItem('pc_db',JSON.stringify(d));
+function authTab(t){
+  document.getElementById('tabNew').classList.toggle('on',t==='new');
+  document.getElementById('tabIn').classList.toggle('on',t==='in');
+  document.getElementById('fNew').style.display=t==='new'?'block':'none';
+  document.getElementById('fIn').style.display=t==='in'?'block':'none';
+}
+function nm(id,txt,cls){const e=document.getElementById(id);e.textContent=txt;e.className='anote '+cls}
+function reg(){
+  const name=document.getElementById('rNm').value.trim();
+  const email=document.getElementById('rEm').value.trim().toLowerCase();
+  const pw=document.getElementById('rPw').value;
+  if(!name||!email||!pw)return nm('regMsg','Please fill in all fields.','err');
+  if(pw.length<6)return nm('regMsg','Password needs 6+ characters.','err');
+  const db=gdb();
+  if(db[email])return nm('regMsg','That email already has an account.','err');
+  const p=name.split(' ');
+  db[email]={name,email,pw,profile:{firstName:p[0]||'',lastName:p.slice(1).join(' ')||'',email,status:'draft'}};
+  sdb(db);nm('regMsg','Account created! Loading...','ok');
+  setTimeout(()=>enter(email),600);
+}
+function login(){
+  const email=document.getElementById('lEm').value.trim().toLowerCase();
+  const pw=document.getElementById('lPw').value;
+  const db=gdb();
+  if(!db[email]||db[email].pw!==pw)return nm('loginMsg','Wrong email or password.','err');
+  enter(email);
+}
+function enter(email){
+  const db=gdb();CU=db[email];
+  localStorage.setItem('pc_last',email);
+  document.getElementById('btnOut').style.display='inline-block';
+  loadForm(CU.profile||{});refreshDash();go('sDash');
+}
+function logout(){
+  CU=null;ph=null;av='available';
+  localStorage.removeItem('pc_last');
+  document.getElementById('btnOut').style.display='none';
+  go('sAuth');
+}
+function go(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('show'));
+  document.getElementById(id).classList.add('show');
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(id==='sDash')refreshDash();
+}
+function col(){
+  const pts=[],cats=[];
+  document.querySelectorAll('#tpList .tprow input').forEach(i=>{if(i.value.trim())pts.push(i.value.trim())});
+  document.querySelectorAll('#cgrid .cchip.on input').forEach(i=>cats.push(i.value));
+  return{
+    firstName:v('fFN'),lastName:v('fLN'),email:v('fCEm'),title:v('fTtl'),city:v('fCty'),
+    website:v('fWeb'),story:v('fSt'),turningPt:v('fTp'),achieve:v('fAc'),
+    igH:v('igH'),igF:n('igF'),ttH:v('ttH'),ttF:n('ttF'),
+    ytU:v('ytU'),ytS:n('ytS'),twH:v('twH'),twF:n('twF'),liU:v('liU'),liF:n('liF'),
+    categories:cats,points:pts,availability:av,
+    format:v('fFmt'),podExp:v('fExp'),clip:v('fClp'),
+    photo:ph,status:CU?.profile?.status||'draft'
+  };
+}
+const v=id=>document.getElementById(id).value.trim();
+const n=id=>parseInt(document.getElementById(id).value)||0;
+function loadForm(p){
+  const sv=(id,val)=>{const e=document.getElementById(id);if(e)e.value=val||''};
+  sv('fFN',p.firstName);sv('fLN',p.lastName);sv('fCEm',p.email);sv('fTtl',p.title);
+  sv('fCty',p.city);sv('fWeb',p.website);sv('fSt',p.story);sv('fTp',p.turningPt);
+  sv('fAc',p.achieve);sv('igH',p.igH);sv('ttH',p.ttH);sv('ytU',p.ytU);sv('twH',p.twH);sv('liU',p.liU);
+  document.getElementById('igF').value=p.igF||'';document.getElementById('ttF').value=p.ttF||'';
+  document.getElementById('ytS').value=p.ytS||'';document.getElementById('twF').value=p.twF||'';
+  document.getElementById('liF').value=p.liF||'';
+  sv('fFmt',p.format||'both');sv('fExp',p.podExp||'never');sv('fClp',p.clip);
+  document.querySelectorAll('#cgrid .cchip').forEach(c=>c.classList.toggle('on',(p.categories||[]).includes(c.querySelector('input').value)));
+  const tl=document.getElementById('tpList');tl.innerHTML='';
+  ((p.points&&p.points.length)?p.points:['']).forEach((pt,i)=>{
+    const r=document.createElement('div');r.className='tprow';
+    r.innerHTML='<input type="text" value="'+esc(pt)+'" placeholder="Add a talking point..." oninput="save()">'+
+      (i>0?'<button class="tpdel" onclick="delTp(this)">&#x2715;</button>':'');
+    tl.appendChild(r);
+  });
+  av=p.availability||'available';
+  document.querySelectorAll('.avopt').forEach(o=>o.classList.toggle('on',o.querySelector('input').value===av));
+  if(p.photo){ph=p.photo;showPh(p.photo);}
+  wc();
+}
+const esc=s=>String(s).replace(/"/g,'&quot;').replace(/</g,'&lt;');
+function flipC(el){el.classList.toggle('on');save()}
+function pickAv(el,val){av=val;document.querySelectorAll('.avopt').forEach(o=>o.classList.remove('on'));el.classList.add('on');save()}
+function addTp(){
+  const l=document.getElementById('tpList');
+  if(l.children.length>=6)return toast('Max 6 talking points','err');
+  const r=document.createElement('div');r.className='tprow';
+  r.innerHTML='<input type="text" placeholder="Add a talking point..." oninput="save()"><button class="tpdel" onclick="delTp(this)">&#x2715;</button>';
+  l.appendChild(r);r.querySelector('input').focus();
+}
+function delTp(b){b.closest('.tprow').remove();save()}
+function onPhoto(inp){
+  if(!inp.files||!inp.files[0])return;
+  const r=new FileReader();r.onload=e=>{ph=e.target.result;showPh(ph);save()};
+  r.readAsDataURL(inp.files[0]);
+}
+function showPh(src){
+  const i=document.getElementById('pImg');i.src=src;i.style.display='block';
+  document.getElementById('pIco').style.display='none';
+  document.getElementById('pLbl').textContent='Photo uploaded - click to change';
+  document.getElementById('pDrop').classList.add('loaded');
+}
+function wc(){
+  const w=document.getElementById('fSt').value.trim().split(/\s+/).filter(Boolean).length;
+  document.getElementById('wcH').textContent=w+' words - aim for 80-200';
+}
+function save(){
+  document.getElementById('sInfo').textContent='Saving...';
+  document.getElementById('sInfo').className='saveinfo';
+  clearTimeout(sT);sT=setTimeout(doSave,1000);
+}
+function doSave(){
+  if(!CU)return;
+  const db=gdb();
+  db[CU.email].profile={...col(),status:CU.profile?.status||'draft'};
+  sdb(db);CU=db[CU.email];
+  document.getElementById('sInfo').textContent='All changes saved';
+  document.getElementById('sInfo').className='saveinfo saved';
+}
+function submitReview(){
+  if(!CU)return;doSave();
+  const p=CU.profile;
+  if(!p.firstName||!p.story){go('sForm');return toast('Please add your name and story first.','err')}
+  const db=gdb();
+  const id='u_'+CU.email.replace(/[^a-z0-9]/gi,'_');
+  db[CU.email].profile.status='pending';
+  db[CU.email].profile.id=id;
+  db[CU.email].profile.submittedAt=new Date().toISOString();
+  sdb(db);CU=db[CU.email];
+  let pq=JSON.parse(localStorage.getItem('podcircuit_pending')||'[]');
+  pq=pq.filter(a=>a.id!==id);pq.push({...CU.profile});
+  localStorage.setItem('podcircuit_pending',JSON.stringify(pq));
+  refreshDash();toast('Submitted! We will review within 2-3 days.','ok');
+}
+function refreshDash(){
+  if(!CU)return;
+  const p=CU.profile||{};
+  const fn=p.firstName||'',ln=p.lastName||'';
+  document.getElementById('dHello').textContent=fn?'Hey, '+fn+' ':'Welcome!';
+  const status=p.status||'draft';
+  const sm={
+    draft:{icon:'📝',title:'Profile Draft',desc:'Not submitted yet. Complete your info and hit Submit for Review.'},
+    pending:{icon:'⏳',title:'Under Review',desc:'Submitted! Our team will review within 2-3 business days.'},
+    approved:{icon:'✅',title:"You're Live!",desc:'Your profile is approved and visible to podcast producers right now.'},
+    rejected:{icon:'❌',title:'Not Approved',desc:'Update your story and social media info, then resubmit.'}
+  };
+  const s=sm[status]||sm.draft;
+  document.getElementById('dBand').className='sband '+status;
+  document.getElementById('dBI').textContent=s.icon;
+  document.getElementById('dBT').textContent=s.title;
+  document.getElementById('dBD').textContent=s.desc;
+  const sb=document.getElementById('dSub');
+  sb.style.display=(status==='draft'||status==='rejected')?'inline-flex':'none';
+  sb.textContent=status==='rejected'?'Resubmit':'🚀 Submit for Review';
+  const av2=document.getElementById('dAv');
+  if(p.photo){av2.innerHTML='<img src="'+p.photo+'">';}
+  else{av2.textContent=((fn[0]||'')+(ln[0]||'')).toUpperCase()||'?'}
+  document.getElementById('dNm').textContent=[fn,ln].filter(Boolean).join(' ')||'Your Name';
+  document.getElementById('dTtl').textContent=p.title||'Your title / tagline';
+  document.getElementById('dTags').innerHTML=(p.categories||[]).map(c=>'<span class="pctag">'+c+'</span>').join('');
+  const st=document.getElementById('dStory');
+  if(p.story){st.className='pcstory';st.textContent=p.story.length>200?p.story.slice(0,200)+'...':p.story;}
+  else{st.className='pcstory empty';st.textContent='No story added yet...'}
+  const vp=(p.points||[]).filter(Boolean);
+  const pw=document.getElementById('dPW');
+  if(vp.length){pw.style.display='block';document.getElementById('dPts').innerHTML=vp.slice(0,4).map(pt=>'<div class="pcpt"><span class="pcptd">●</span><span>'+pt+'</span></div>').join('');}
+  else{pw.style.display='none'}
+  const scs=[
+    {ic:'📸',lb:'Instagram',vl:p.igF},{ic:'🎵',lb:'TikTok',vl:p.ttF},
+    {ic:'▶️',lb:'YouTube',vl:p.ytS},{ic:'🐦',lb:'Twitter',vl:p.twF},
+    {ic:'💼',lb:'LinkedIn',vl:p.liF}
+  ].filter(s=>s.vl>0);
+  const sw=document.getElementById('dSW');
+  if(scs.length){sw.style.display='block';document.getElementById('dSoc').innerHTML=scs.map(s=>'<div class="pcsoci">'+s.ic+' <span class="pcscn">'+fmt(s.vl)+'</span> '+s.lb+'</div>').join('');}
+  else{sw.style.display='none'}
+}
+function fmt(n){n=parseInt(n)||0;if(n>=1e6)return(n/1e6).toFixed(1).replace(/\.0$/,'')+'M';if(n>=1000)return Math.round(n/1000)+'K';return n>0?String(n):'0'}
+function toast(msg,type){
+  const t=document.getElementById('toastEl');t.textContent=msg;t.className='toast show '+(type||'inf');
+  clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),3600);
+}
+(function(){
+  const last=localStorage.getItem('pc_last');
+  if(last){const db=gdb();if(db[last]){enter(last);return;}}
+})();
+</script>
+</body>
+</html>

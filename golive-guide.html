@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PodCircuit — Go Live Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--ink:#0e0c0a;--paper:#f5f0e8;--cream:#ede7d9;--gold:#c9a84c;--teal:#1a6b6b;--teal-lt:#e8f4f4;--muted:#7a7060;--border:#d8d0c0;--green:#1a7a3c}
+body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);line-height:1.6}
+.topbar{background:var(--ink);border-bottom:2px solid var(--gold);height:60px;padding:0 40px;display:flex;align-items:center;gap:12px}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;color:var(--gold)}
+.logo-sub{color:#555;font-size:.82rem}
+.wrap{max-width:820px;margin:0 auto;padding:52px 28px 100px}
+h1{font-family:'Syne',sans-serif;font-weight:800;font-size:2rem;letter-spacing:-.5px;margin-bottom:8px}
+.lead{font-size:1rem;color:var(--muted);font-weight:300;margin-bottom:48px;line-height:1.6;max-width:600px}
+.section{margin-bottom:48px}
+.section-num{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;background:var(--ink);color:var(--gold);font-family:'Syne',sans-serif;font-weight:800;font-size:.9rem;border-radius:50%;flex-shrink:0;margin-right:12px}
+.section-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;display:flex;align-items:center;margin-bottom:16px}
+.section-title .badge{background:var(--teal-lt);color:var(--teal);font-size:.68rem;font-weight:700;padding:3px 9px;border-radius:10px;margin-left:10px;letter-spacing:.5px;font-family:'DM Sans',sans-serif}
+.section-title .badge.free{background:#edf7f0;color:var(--green)}
+p{font-size:.92rem;color:#444;margin-bottom:12px;font-weight:300}
+.steps{display:flex;flex-direction:column;gap:14px;margin:20px 0}
+.step{display:flex;gap:14px;align-items:flex-start;background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:16px 18px}
+.step-num{width:26px;height:26px;background:var(--gold);color:var(--ink);border-radius:50%;font-family:'Syne',sans-serif;font-weight:800;font-size:.78rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.step-body{flex:1}
+.step-title{font-weight:600;font-size:.9rem;margin-bottom:3px}
+.step-desc{font-size:.82rem;color:var(--muted);font-weight:300;line-height:1.5}
+.step-desc a{color:var(--teal)}
+.code-block{background:var(--ink);color:#f0d98a;font-family:monospace;font-size:.82rem;padding:16px 20px;border-radius:8px;margin:14px 0;line-height:1.7;overflow-x:auto;position:relative}
+.code-block .comment{color:#555}
+.copy-btn{position:absolute;top:10px;right:10px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#aaa;padding:4px 10px;border-radius:5px;font-size:.72rem;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif}
+.copy-btn:hover{background:rgba(255,255,255,.15);color:#fff}
+.highlight-box{background:var(--cream);border:1.5px solid var(--border);border-left:4px solid var(--gold);border-radius:0 8px 8px 0;padding:14px 18px;margin:16px 0;font-size:.85rem;color:var(--ink)}
+.highlight-box strong{font-weight:600}
+.warning-box{background:#fdf6e3;border:1.5px solid #e8d08a;border-left:4px solid var(--gold);border-radius:0 8px 8px 0;padding:14px 18px;margin:16px 0;font-size:.85rem;color:#6a4a10}
+.green-box{background:#edf7f0;border:1.5px solid #8ecba0;border-radius:10px;padding:18px 20px;margin:20px 0}
+.green-box h3{font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;color:var(--green);margin-bottom:6px}
+.green-box p{color:#2a6a3a;font-size:.85rem;margin:0}
+.checklist{display:flex;flex-direction:column;gap:8px;margin:16px 0}
+.check-item{display:flex;align-items:flex-start;gap:10px;font-size:.88rem}
+.check-icon{color:var(--green);font-weight:700;flex-shrink:0;margin-top:1px}
+.divider{border:none;border-top:1.5px solid var(--border);margin:40px 0}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0}
+.col-card{background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:18px}
+.col-card h4{font-family:'Syne',sans-serif;font-weight:700;font-size:.88rem;margin-bottom:8px}
+.col-card p{font-size:.8rem;color:var(--muted);margin:0}
+.col-card .price{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--teal);margin-bottom:4px}
+.dev-section{background:var(--ink);color:var(--paper);border-radius:12px;padding:28px 30px;margin-top:20px}
+.dev-section h3{font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;color:var(--gold);margin-bottom:12px}
+.dev-section p{color:#aaa;font-size:.85rem;font-weight:300;margin-bottom:8px}
+.dev-section code{background:rgba(255,255,255,.08);padding:2px 7px;border-radius:4px;font-family:monospace;font-size:.8rem;color:#f0d98a}
+@media(max-width:580px){.two-col{grid-template-columns:1fr}.wrap{padding:32px 18px 80px}.topbar{padding:0 20px}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo">🎙 PodCircuit</div>
+  <div class="logo-sub">/ Go Live Guide</div>
+</div>
+
+<div class="wrap">
+  <h1>How to Go Live — No Developer Needed</h1>
+  <p class="lead">Your site is fully built. Follow these steps in order and PodCircuit will be live on the internet with a real database within about 30 minutes. Everything here is free or cheap, and none of it requires coding.</p>
+
+  <!-- ── STEP 1: SUPABASE ── -->
+  <div class="section">
+    <div class="section-title">
+      <span class="section-num">1</span>
+      Set Up Your Database (Supabase)
+      <span class="badge free">FREE</span>
+    </div>
+    <p>Supabase is a free database that stores your guest profiles in the cloud so anyone can sign up from any device. You just need to create an account and copy two values into your site files.</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Go to supabase.com and create a free account</div>
+          <div class="step-desc">Click "Start for free" — sign up with Google or email. It's completely free for small projects.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Create a new project</div>
+          <div class="step-desc">Click "New Project" → give it a name like "podcircuit" → set a database password (save this somewhere) → click "Create new project." Wait about 60 seconds for it to set up.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Create the guest_profiles table</div>
+          <div class="step-desc">In your project, click "Table Editor" in the left sidebar → "New Table" → name it <strong>guest_profiles</strong> → enable "Row Level Security" → click Save. Then run this SQL to create all the columns:</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="code-block">
+      <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<span class="comment">-- Run this in Supabase: SQL Editor → New Query → paste → Run</span>
+
+create table guest_profiles (
+  id uuid default gen_random_uuid() primary key,
+  user_id text unique not null,
+  email text not null,
+  first_name text,
+  last_name text,
+  title text,
+  city text,
+  website text,
+  story text,
+  turning_pt text,
+  achieve text,
+  ig_handle text, ig_followers integer default 0,
+  tt_handle text, tt_followers integer default 0,
+  yt_url text,    yt_subs integer default 0,
+  tw_handle text, tw_followers integer default 0,
+  li_url text,    li_followers integer default 0,
+  categories text[] default '{}',
+  points text[] default '{}',
+  availability text default 'available',
+  format text default 'both',
+  pod_exp text default 'never',
+  clip text,
+  photo_url text,
+  status text default 'draft',
+  submitted_at timestamptz,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+<span class="comment">-- Allow anyone to read approved profiles (for the browse page)</span>
+create policy "Public can read approved profiles"
+  on guest_profiles for select
+  using (status = 'approved');
+
+<span class="comment">-- Allow users to manage their own profile</span>
+create policy "Users manage own profile"
+  on guest_profiles for all
+  using (true) with check (true);
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <div class="step-title">Get your two keys</div>
+          <div class="step-desc">Click "Project Settings" (gear icon) → "API" → you'll see two values: <strong>Project URL</strong> and <strong>anon public key</strong>. Copy both — you'll need them in the next step.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <div class="step-title">Paste your keys into the config file</div>
+          <div class="step-desc">Open <strong>supabase-config.js</strong> (included with your files) and replace the two placeholder values with your real keys. That's it — your database is connected.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="highlight-box">
+      <strong>That's the only "technical" step</strong> — and it's really just copying and pasting two lines of text. No coding required.
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ── STEP 2: EMAIL NOTIFICATIONS ── -->
+  <div class="section">
+    <div class="section-title">
+      <span class="section-num">2</span>
+      Set Up Email Notifications (Formspree)
+      <span class="badge free">FREE</span>
+    </div>
+    <p>Every time someone submits a profile, you'll get an email. Takes 5 minutes.</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Go to formspree.io and create a free account</div>
+          <div class="step-desc">Sign up free — you get 50 submissions/month at no cost.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Create a new form</div>
+          <div class="step-desc">Click "New Form" → name it "PodCircuit Guest Applications" → set your email address as the recipient → click Create.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Copy your Form ID and paste it in supabase-config.js</div>
+          <div class="step-desc">Your form will have a URL like <code>formspree.io/f/abcd1234</code> — the part after /f/ is your ID. Open supabase-config.js and paste it where it says FORMSPREE_ID.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ── STEP 3: DOMAIN ── -->
+  <div class="section">
+    <div class="section-title">
+      <span class="section-num">3</span>
+      Buy Your Domain Name
+      <span class="badge">~$10/year</span>
+    </div>
+    <p>Your domain is your website address — like <strong>podcircuit.com</strong>. Here's how to get one in under 10 minutes.</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Go to namecheap.com</div>
+          <div class="step-desc">Search for the domain name you want. Try: podcircuit.com, getpodcircuit.com, joinpodcircuit.com, podguestlist.com — whatever fits your brand.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Buy it</div>
+          <div class="step-desc">Most .com domains cost $9–$14/year. Add to cart and check out. Skip the extras — you don't need them.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="warning-box">
+      <strong>Don't overthink the name.</strong> You can always redirect a domain later. Get something simple and move on — the product matters more than the URL.
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ── STEP 4: HOSTING ── -->
+  <div class="section">
+    <div class="section-title">
+      <span class="section-num">4</span>
+      Host Your Site (Netlify)
+      <span class="badge free">FREE</span>
+    </div>
+    <p>Netlify puts your files on the internet. It's free, takes about 5 minutes, and has a drag-and-drop upload.</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Go to netlify.com and create a free account</div>
+          <div class="step-desc">Sign up with email or Google — completely free.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Drag and drop your files</div>
+          <div class="step-desc">On your Netlify dashboard, there's a box that says "drag and drop your site folder here." Put all 5 of your files in one folder on your computer and drag the whole folder in. Your site will be live instantly at a temporary URL like <code>random-name.netlify.app</code>.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Connect your custom domain</div>
+          <div class="step-desc">In Netlify: Site Settings → Domain Management → Add Custom Domain → type your domain → follow the steps to point your Namecheap domain to Netlify. Netlify walks you through it step by step. Takes about 10 minutes and then your site is live at your real URL.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="green-box">
+      <h3>✅ At this point your site is fully live</h3>
+      <p>Anyone in the world can visit your URL, create a guest profile, and podcast producers can browse and filter guests. You manage approvals from the admin dashboard.</p>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ── COST SUMMARY ── -->
+  <div class="section">
+    <div class="section-title">
+      <span class="section-num">5</span>
+      Total Cost to Launch
+    </div>
+
+    <div class="two-col">
+      <div class="col-card">
+        <div class="price">$0/month</div>
+        <h4>Supabase Database</h4>
+        <p>Free up to 50,000 rows — that's 50,000 guest profiles before you'd ever need to pay.</p>
+      </div>
+      <div class="col-card">
+        <div class="price">$0/month</div>
+        <h4>Netlify Hosting</h4>
+        <p>Free tier handles up to 100GB of traffic/month — more than enough to start.</p>
+      </div>
+      <div class="col-card">
+        <div class="price">$0/month</div>
+        <h4>Formspree Emails</h4>
+        <p>Free up to 50 submissions/month. Upgrade to $10/month when you're bigger.</p>
+      </div>
+      <div class="col-card">
+        <div class="price">~$12/year</div>
+        <h4>Domain Name</h4>
+        <p>The only thing you actually pay for. About $1/month.</p>
+      </div>
+    </div>
+
+    <div class="highlight-box">
+      <strong>Total to launch: about $12.</strong> You can run PodCircuit for the first year for the cost of one lunch.
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ── YOUR 5 FILES ── -->
+  <div class="section">
+    <div class="section-title">
+      <span class="section-num">6</span>
+      Your 5 Files — What Each One Does
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num" style="background:var(--teal);color:#fff">1</div>
+        <div class="step-body">
+          <div class="step-title">podcast-circuit.html — The main browse page</div>
+          <div class="step-desc">What podcast producers see. Shows all approved guest profiles with search and filters.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num" style="background:var(--teal);color:#fff">2</div>
+        <div class="step-body">
+          <div class="step-title">podcircuit-profile.html — Guest profile builder</div>
+          <div class="step-desc">Where guests create an account, build their profile, and submit for review.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num" style="background:var(--teal);color:#fff">3</div>
+        <div class="step-body">
+          <div class="step-title">podcircuit-admin.html — Your admin dashboard</div>
+          <div class="step-desc">Password-protected. Where you approve or reject guest submissions. Approved guests go live instantly.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num" style="background:var(--teal);color:#fff">4</div>
+        <div class="step-body">
+          <div class="step-title">podcircuit-apply.html — Alternative application form</div>
+          <div class="step-desc">A multi-step form option for guests who prefer a guided experience instead of the self-build profile page.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num" style="background:var(--gold);color:var(--ink)">5</div>
+        <div class="step-body">
+          <div class="step-title">supabase-config.js — Your database connection</div>
+          <div class="step-desc">The one file you need to edit. Paste your Supabase URL and key here. All other files pull from this one so you only have to do it once.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ── IF YOU WANT A DEVELOPER ── -->
+  <div class="section">
+    <div class="section-title">
+      <span class="section-num">7</span>
+      If You Do Want to Hire a Developer
+    </div>
+    <p>If you'd rather hand this off, here is exactly what to tell them. You can copy and paste this directly into a message on Upwork, Fiverr, or to any freelancer.</p>
+
+    <div class="dev-section">
+      <h3>📋 Developer Brief — Copy This Exactly</h3>
+      <p>I have a fully designed and built website called PodCircuit — a marketplace for podcast guests. All the HTML, CSS, and JavaScript is done. I need someone to connect the backend so it works with real users across devices.</p>
+      <p><strong style="color:var(--gold)">The work is:</strong></p>
+      <p>1. Set up a Supabase project and create the <code>guest_profiles</code> table using the SQL I'll provide.</p>
+      <p>2. Replace the localStorage calls in the 3 main HTML files with Supabase JavaScript SDK calls. The functions are already written and labeled — you're just swapping the storage layer.</p>
+      <p>3. Set up Supabase Auth (email/password) to replace the current custom auth in <code>podcircuit-profile.html</code>.</p>
+      <p>4. Set up a Formspree account and plug the ID into one line in the config file.</p>
+      <p>5. Deploy everything to Netlify and connect the custom domain I'll provide.</p>
+      <p><strong style="color:var(--gold)">This is a 4–6 hour job for an experienced developer.</strong> Budget $150–$300 on Upwork. The design and all functionality is already built — they are not building anything from scratch.</p>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- FINAL CHECKLIST -->
+  <div class="section">
+    <div class="section-title">
+      <span class="section-num">✓</span>
+      Launch Checklist
+    </div>
+    <div class="checklist">
+      <div class="check-item"><span class="check-icon">☐</span><span>Create Supabase account and run the SQL to create the table</span></div>
+      <div class="check-item"><span class="check-icon">☐</span><span>Copy Supabase URL and anon key into <strong>supabase-config.js</strong></span></div>
+      <div class="check-item"><span class="check-icon">☐</span><span>Create Formspree account and paste Form ID into <strong>supabase-config.js</strong></span></div>
+      <div class="check-item"><span class="check-icon">☐</span><span>Buy domain name on Namecheap</span></div>
+      <div class="check-item"><span class="check-icon">☐</span><span>Create Netlify account and drag-and-drop your 5 files</span></div>
+      <div class="check-item"><span class="check-icon">☐</span><span>Connect your domain in Netlify settings</span></div>
+      <div class="check-item"><span class="check-icon">☐</span><span>Change the admin dashboard password in <strong>podcircuit-admin.html</strong> (search for "podcircuit2026" and replace it)</span></div>
+      <div class="check-item"><span class="check-icon">☐</span><span>Test by creating a guest profile yourself and approving it</span></div>
+      <div class="check-item"><span class="check-icon">☐</span><span>Share the link and start getting guests to sign up 🚀</span></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function copyCode(btn) {
+  const block = btn.closest('.code-block');
+  const text = block.innerText.replace('Copy','').replace('Copied!','').trim();
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = 'Copy', 2000);
+  });
+}
+</script>
+</body>
+</html>

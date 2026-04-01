@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PodCircuit — Find Your Next Guest</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0e0c0a;
+    --paper: #f5f0e8;
+    --cream: #ede7d9;
+    --gold: #c9a84c;
+    --gold-light: #f0d98a;
+    --rust: #b84a2e;
+    --teal: #1a6b6b;
+    --teal-light: #e8f4f4;
+    --muted: #7a7060;
+    --card-bg: #ffffff;
+    --border: #d8d0c0;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 0 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 68px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 2px solid var(--gold);
+  }
+
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.4rem;
+    letter-spacing: -0.5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .logo-dot {
+    width: 10px; height: 10px;
+    background: var(--gold);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(0.8); }
+  }
+
+  nav { display: flex; gap: 28px; align-items: center; }
+
+  nav a {
+    color: #ccc;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: color 0.2s;
+    letter-spacing: 0.3px;
+  }
+
+  nav a:hover { color: var(--gold); }
+
+  .btn-join {
+    background: var(--gold);
+    color: var(--ink);
+    border: none;
+    padding: 9px 22px;
+    border-radius: 4px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    transition: background 0.2s, transform 0.1s;
+  }
+
+  .btn-join:hover { background: var(--gold-light); transform: translateY(-1px); }
+
+  /* ── HERO ── */
+  .hero {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 80px 40px 70px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 60% 80% at 50% 120%, rgba(201,168,76,0.18) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-label {
+    display: inline-block;
+    background: rgba(201,168,76,0.15);
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 5px 16px;
+    border-radius: 20px;
+    margin-bottom: 28px;
+  }
+
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2.4rem, 5vw, 4rem);
+    font-weight: 800;
+    line-height: 1.1;
+    max-width: 700px;
+    margin: 0 auto 22px;
+    letter-spacing: -1.5px;
+  }
+
+  .hero h1 em {
+    font-style: normal;
+    color: var(--gold);
+  }
+
+  .hero p {
+    color: #aaa;
+    font-size: 1.05rem;
+    max-width: 520px;
+    margin: 0 auto 40px;
+    line-height: 1.6;
+    font-weight: 300;
+  }
+
+  .hero-stats {
+    display: flex;
+    justify-content: center;
+    gap: 48px;
+    margin-top: 50px;
+    padding-top: 40px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+  }
+
+  .stat-val {
+    font-family: 'Syne', sans-serif;
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--gold);
+  }
+
+  .stat-label {
+    font-size: 0.8rem;
+    color: #888;
+    letter-spacing: 0.5px;
+    margin-top: 2px;
+  }
+
+  /* ── SEARCH BAR ── */
+  .search-bar-wrap {
+    background: var(--ink);
+    padding: 0 40px 50px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .search-bar {
+    background: var(--cream);
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    width: 100%;
+    max-width: 860px;
+    overflow: hidden;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .search-bar:focus-within {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(201,168,76,0.15);
+  }
+
+  .search-icon {
+    padding: 0 18px;
+    color: var(--muted);
+    font-size: 1.1rem;
+  }
+
+  .search-bar input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 16px 0;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    color: var(--ink);
+    outline: none;
+  }
+
+  .search-bar input::placeholder { color: var(--muted); }
+
+  .search-divider {
+    width: 1px;
+    height: 28px;
+    background: var(--border);
+  }
+
+  .search-select {
+    border: none;
+    background: transparent;
+    padding: 16px 20px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    color: var(--muted);
+    outline: none;
+    cursor: pointer;
+  }
+
+  .search-btn {
+    background: var(--gold);
+    border: none;
+    padding: 16px 28px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--ink);
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    transition: background 0.2s;
+    white-space: nowrap;
+  }
+
+  .search-btn:hover { background: var(--gold-light); }
+
+  /* ── FILTER TAGS ── */
+  .filter-section {
+    padding: 28px 40px 10px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .filter-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-right: 4px;
+  }
+
+  .tag {
+    border: 1.5px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.18s;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .tag:hover, .tag.active {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--paper);
+  }
+
+  .tag.active {
+    background: var(--teal);
+    border-color: var(--teal);
+    color: white;
+  }
+
+  /* ── MAIN GRID ── */
+  .main-wrap {
+    padding: 32px 40px 80px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .results-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+
+  .results-count {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: var(--ink);
+  }
+
+  .results-count span { color: var(--teal); }
+
+  .sort-select {
+    border: 1.5px solid var(--border);
+    background: var(--card-bg);
+    padding: 7px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    color: var(--ink);
+    border-radius: 6px;
+    outline: none;
+    cursor: pointer;
+  }
+
+  .guest-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+    gap: 24px;
+  }
+
+  /* ── GUEST CARD ── */
+  .guest-card {
+    background: var(--card-bg);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+    cursor: pointer;
+    animation: fadeUp 0.4s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .guest-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.1);
+    border-color: var(--gold);
+  }
+
+  .card-top {
+    padding: 24px 24px 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .avatar {
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--cream);
+    flex-shrink: 0;
+    background: var(--cream);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.4rem;
+    color: var(--ink);
+  }
+
+  .card-identity { flex: 1; min-width: 0; }
+
+  .guest-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: var(--ink);
+    letter-spacing: -0.3px;
+    margin-bottom: 3px;
+  }
+
+  .guest-title {
+    font-size: 0.82rem;
+    color: var(--muted);
+    font-weight: 400;
+    margin-bottom: 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .topic-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+
+  .topic-tag {
+    background: var(--teal-light);
+    color: var(--teal);
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 3px 9px;
+    border-radius: 12px;
+    letter-spacing: 0.3px;
+  }
+
+  .card-story {
+    padding: 0 24px 18px;
+    font-size: 0.86rem;
+    color: #555;
+    line-height: 1.55;
+    font-weight: 300;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .card-social {
+    padding: 16px 24px;
+    border-top: 1px solid var(--cream);
+    display: flex;
+    gap: 16px;
+    align-items: center;
+  }
+
+  .social-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+    color: var(--muted);
+    font-size: 0.8rem;
+    font-weight: 500;
+    transition: color 0.15s;
+  }
+
+  .social-item:hover { color: var(--ink); }
+
+  .social-icon {
+    width: 18px; height: 18px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.85rem;
+  }
+
+  .social-count { font-weight: 600; color: var(--ink); }
+
+  .card-footer {
+    padding: 14px 24px;
+    background: var(--cream);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .availability {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #2d7a2d;
+  }
+
+  .avail-dot {
+    width: 7px; height: 7px;
+    background: #4caf50;
+    border-radius: 50%;
+  }
+
+  .btn-view {
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    padding: 7px 16px;
+    border-radius: 5px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 600;
+    font-size: 0.78rem;
+    cursor: pointer;
+    letter-spacing: 0.3px;
+    transition: background 0.15s;
+  }
+
+  .btn-view:hover { background: var(--teal); }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(14,12,10,0.7);
+    z-index: 200;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    backdrop-filter: blur(4px);
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--card-bg);
+    border-radius: 16px;
+    max-width: 660px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    border: 2px solid var(--border);
+    animation: slideUp 0.25s ease;
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .modal-header {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 28px 32px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    border-radius: 14px 14px 0 0;
+  }
+
+  .modal-avatar {
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    border: 3px solid var(--gold);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.8rem;
+    color: var(--gold);
+    background: rgba(201,168,76,0.1);
+    flex-shrink: 0;
+  }
+
+  .modal-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+  }
+
+  .modal-title { color: #aaa; font-size: 0.9rem; margin-top: 3px; font-weight: 300; }
+
+  .modal-close {
+    margin-left: auto;
+    background: rgba(255,255,255,0.1);
+    border: none;
+    color: #ccc;
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.1rem;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s;
+  }
+
+  .modal-close:hover { background: rgba(255,255,255,0.2); color: white; }
+
+  .modal-body { padding: 28px 32px; }
+
+  .modal-section { margin-bottom: 26px; }
+
+  .modal-section-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.75rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--cream);
+  }
+
+  .modal-story { font-size: 0.92rem; color: #444; line-height: 1.7; font-weight: 300; }
+
+  .social-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .social-card {
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: var(--ink);
+    transition: border-color 0.15s, background 0.15s;
+  }
+
+  .social-card:hover { border-color: var(--gold); background: #fffdf7; }
+
+  .social-platform {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.82rem;
+  }
+
+  .social-followers {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--teal);
+    font-family: 'Syne', sans-serif;
+  }
+
+  .social-flabel {
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
+
+  .talking-points {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .talking-point {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 0.88rem;
+    color: #444;
+  }
+
+  .tp-bullet {
+    width: 6px; height: 6px;
+    background: var(--gold);
+    border-radius: 50%;
+    margin-top: 6px;
+    flex-shrink: 0;
+  }
+
+  .modal-footer {
+    padding: 20px 32px;
+    background: var(--cream);
+    border-radius: 0 0 14px 14px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .btn-contact {
+    background: var(--teal);
+    color: white;
+    border: none;
+    padding: 12px 28px;
+    border-radius: 6px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.88rem;
+    cursor: pointer;
+    letter-spacing: 0.3px;
+    transition: background 0.15s;
+    flex: 1;
+    text-align: center;
+  }
+
+  .btn-contact:hover { background: #145555; }
+
+  .btn-save {
+    background: transparent;
+    color: var(--ink);
+    border: 1.5px solid var(--border);
+    padding: 12px 20px;
+    border-radius: 6px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.88rem;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .btn-save:hover { border-color: var(--ink); background: var(--ink); color: var(--paper); }
+
+  /* ── EMPTY / FOOTER ── */
+  .footer {
+    background: var(--ink);
+    color: #888;
+    text-align: center;
+    padding: 32px 40px;
+    font-size: 0.82rem;
+    border-top: 1px solid #222;
+  }
+
+  .footer strong { color: var(--gold); }
+
+  @media (max-width: 640px) {
+    header { padding: 0 20px; }
+    nav a { display: none; }
+    .hero, .search-bar-wrap { padding-left: 20px; padding-right: 20px; }
+    .filter-section, .main-wrap { padding-left: 20px; padding-right: 20px; }
+    .hero-stats { gap: 24px; }
+    .guest-grid { grid-template-columns: 1fr; }
+    .social-grid { grid-template-columns: 1fr; }
+    .modal-body, .modal-header, .modal-footer { padding: 20px; }
+    .search-select { display: none; }
+    .search-divider { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">
+    <div class="logo-dot"></div>
+    PodCircuit
+  </div>
+  <nav>
+    <a href="#">Browse Guests</a>
+    <a href="#">For Podcasters</a>
+    <a href="#">Pricing</a>
+    <button class="btn-join" onclick="openJoinModal()">Apply as Guest</button>
+  </nav>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-label">🎙 The Podcast Guest Marketplace</div>
+  <h1>Book <em>Remarkable Guests</em><br>for Your Podcast</h1>
+  <p>Thousands of vetted speakers with verified social followings, rich backstories, and proven audience appeal — all in one place.</p>
+  <div class="hero-stats">
+    <div>
+      <div class="stat-val">4,200+</div>
+      <div class="stat-label">Available Guests</div>
+    </div>
+    <div>
+      <div class="stat-val">180+</div>
+      <div class="stat-label">Topic Categories</div>
+    </div>
+    <div>
+      <div class="stat-val">12K+</div>
+      <div class="stat-label">Podcasts Served</div>
+    </div>
+  </div>
+</section>
+
+<!-- SEARCH BAR -->
+<div class="search-bar-wrap">
+  <div class="search-bar">
+    <div class="search-icon">🔍</div>
+    <input type="text" id="searchInput" placeholder="Search by name, topic, industry, or keyword..." oninput="filterGuests()">
+    <div class="search-divider"></div>
+    <select class="search-select" id="followingFilter" onchange="filterGuests()">
+      <option value="">Any Following</option>
+      <option value="10k">10K+</option>
+      <option value="50k">50K+</option>
+      <option value="100k">100K+</option>
+      <option value="500k">500K+</option>
+    </select>
+    <div class="search-divider"></div>
+    <select class="search-select" id="categoryFilter" onchange="filterGuests()">
+      <option value="">All Topics</option>
+      <option value="Business">Business</option>
+      <option value="Health">Health & Wellness</option>
+      <option value="True Crime">True Crime</option>
+      <option value="Tech">Tech</option>
+      <option value="Spirituality">Spirituality</option>
+      <option value="Sports">Sports</option>
+      <option value="Finance">Finance</option>
+    </select>
+    <button class="search-btn" onclick="filterGuests()">Search Guests</button>
+  </div>
+</div>
+
+<!-- FILTERS -->
+<div class="filter-section">
+  <span class="filter-label">Quick:</span>
+  <button class="tag active" onclick="quickFilter(this, '')">All</button>
+  <button class="tag" onclick="quickFilter(this, 'Business')">Business</button>
+  <button class="tag" onclick="quickFilter(this, 'Health')">Health & Wellness</button>
+  <button class="tag" onclick="quickFilter(this, 'Tech')">Tech</button>
+  <button class="tag" onclick="quickFilter(this, 'Finance')">Finance</button>
+  <button class="tag" onclick="quickFilter(this, 'True Crime')">True Crime</button>
+  <button class="tag" onclick="quickFilter(this, 'Spirituality')">Spirituality</button>
+  <button class="tag" onclick="quickFilter(this, 'Sports')">Sports</button>
+</div>
+
+<!-- MAIN -->
+<div class="main-wrap">
+  <div class="results-meta">
+    <div class="results-count"><span id="resultCount">12</span> guests found</div>
+    <select class="sort-select">
+      <option>Sort: Most Followed</option>
+      <option>Sort: Most Recent</option>
+      <option>Sort: A–Z</option>
+    </select>
+  </div>
+  <div class="guest-grid" id="guestGrid"></div>
+</div>
+
+<!-- GUEST DETAIL MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal" id="modalBox">
+    <div class="modal-header">
+      <div class="modal-avatar" id="mAvatar"></div>
+      <div>
+        <div class="modal-name" id="mName"></div>
+        <div class="modal-title" id="mTitle"></div>
+      </div>
+      <button class="modal-close" onclick="closeModalDirect()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-section">
+        <div class="modal-section-title">Their Story</div>
+        <p class="modal-story" id="mStory"></p>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-title">Social Media Following</div>
+        <div class="social-grid" id="mSocial"></div>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-title">Talking Points</div>
+        <div class="talking-points" id="mPoints"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-contact">📩 Request This Guest</button>
+      <button class="btn-save">♡ Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  <strong>PodCircuit</strong> · Connecting remarkable voices with the podcasts that need them.<br>
+  <span style="margin-top:6px;display:block;">© 2026 PodCircuit Inc. · <a href="#" style="color:#888;">Privacy</a> · <a href="#" style="color:#888;">Terms</a></span>
+</div>
+
+<script>
+const guests = [
+  {
+    name: "Marcus Bell",
+    initials: "MB",
+    title: "Ex-NFL Player → Entrepreneur",
+    categories: ["Sports","Business"],
+    story: "After a career-ending knee injury in his third NFL season, Marcus rebuilt himself from scratch — launching a protein brand that now does $8M/year in revenue. He's been through bankruptcy, divorce, and depression, and came out the other side with a story no one else has. Raw, real, and magnetic on mic.",
+    social: [
+      { platform: "Instagram", icon: "📸", followers: "284K" },
+      { platform: "TikTok", icon: "🎵", followers: "1.1M" },
+      { platform: "YouTube", icon: "▶️", followers: "98K" },
+      { platform: "X (Twitter)", icon: "🐦", followers: "42K" }
+    ],
+    points: [
+      "Overcoming identity collapse after losing your career",
+      "Building a CPG brand with zero startup capital",
+      "Mental health in professional athletics — what no one talks about",
+      "What NFL locker rooms taught him about leadership"
+    ],
+    availability: true,
+    followingNum: 284000
+  },
+  {
+    name: "Dr. Priya Shankar",
+    initials: "PS",
+    title: "Trauma Surgeon & Burnout Advocate",
+    categories: ["Health"],
+    story: "Priya performed 3,000+ surgeries before walking away from the OR at 38. She's written about physician burnout for the NY Times, testified before Congress, and now helps healthcare workers rebuild their lives. She speaks with the authority of someone who lived the crisis.",
+    social: [
+      { platform: "Instagram", icon: "📸", followers: "132K" },
+      { platform: "LinkedIn", icon: "💼", followers: "88K" },
+      { platform: "Substack", icon: "✍️", followers: "27K" },
+      { platform: "X (Twitter)", icon: "🐦", followers: "63K" }
+    ],
+    points: [
+      "The hidden burnout epidemic inside U.S. hospitals",
+      "What surgeons are never taught about emotions",
+      "How she rebuilt her identity after leaving medicine",
+      "Why America's healthcare system eats its workers"
+    ],
+    availability: true,
+    followingNum: 132000
+  },
+  {
+    name: "Jonah Reeves",
+    initials: "JR",
+    title: "Former Gang Member → Prison Reform CEO",
+    categories: ["True Crime","Business"],
+    story: "Jonah spent 11 years in a California state prison for armed robbery. Inside, he earned two degrees. He now runs a company that employs formerly incarcerated people and has placed over 1,400 men and women into sustainable careers. His testimony before the Senate Judiciary Committee went viral.",
+    social: [
+      { platform: "Instagram", icon: "📸", followers: "317K" },
+      { platform: "TikTok", icon: "🎵", followers: "2.3M" },
+      { platform: "YouTube", icon: "▶️", followers: "411K" },
+      { platform: "LinkedIn", icon: "💼", followers: "54K" }
+    ],
+    points: [
+      "What prison actually does to a young man's mind",
+      "The moment everything changed for him — and why",
+      "Building a company with a criminal record",
+      "Why recidivism is a policy failure, not a character failure"
+    ],
+    availability: true,
+    followingNum: 317000
+  },
+  {
+    name: "Simone Carter",
+    initials: "SC",
+    title: "Cult Survivor & Mental Health Author",
+    categories: ["Spirituality","Health"],
+    story: "Simone spent seven years inside a New Age spiritual community before escaping at 29. Her memoir sold 220,000 copies and she now trains therapists in cult recovery. She's one of the clearest, calmest voices on coercive control in the country — and utterly compelling to listen to.",
+    social: [
+      { platform: "Instagram", icon: "📸", followers: "198K" },
+      { platform: "TikTok", icon: "🎵", followers: "874K" },
+      { platform: "YouTube", icon: "▶️", followers: "210K" },
+      { platform: "X (Twitter)", icon: "🐦", followers: "31K" }
+    ],
+    points: [
+      "How cults recruit intelligent, successful people",
+      "The psychological aftermath of high-control groups",
+      "What therapists get wrong about cult recovery",
+      "Why spiritual abuse is the most underreported trauma"
+    ],
+    availability: true,
+    followingNum: 198000
+  },
+  {
+    name: "Trevor Okafor",
+    initials: "TO",
+    title: "Angel Investor & First-Gen Millionaire",
+    categories: ["Finance","Business"],
+    story: "Trevor grew up in a two-bedroom apartment in Detroit with four siblings and a single mother working two jobs. He dropped out of college at 19 to trade penny stocks, lost everything at 22, then rebuilt to an 8-figure net worth by 30. He now invests in overlooked founders from non-traditional backgrounds.",
+    social: [
+      { platform: "YouTube", icon: "▶️", followers: "1.8M" },
+      { platform: "Instagram", icon: "📸", followers: "540K" },
+      { platform: "TikTok", icon: "🎵", followers: "3.2M" },
+      { platform: "LinkedIn", icon: "💼", followers: "120K" }
+    ],
+    points: [
+      "What nobody tells poor kids about building wealth",
+      "How he lost $400K and came back stronger",
+      "The psychological cost of being the first in your family to 'make it'",
+      "Why he bets on overlooked founders and how he finds them"
+    ],
+    availability: true,
+    followingNum: 1800000
+  },
+  {
+    name: "Anika Solberg",
+    initials: "AS",
+    title: "Tech Whistleblower & Privacy Activist",
+    categories: ["Tech"],
+    story: "Anika was a senior engineer at a social media giant who leaked internal documents showing the company knew its algorithm amplified extremist content. She gave up her career, her stock options, and her anonymity. Now she advises governments and builds open-source privacy tools.",
+    social: [
+      { platform: "X (Twitter)", icon: "🐦", followers: "621K" },
+      { platform: "Substack", icon: "✍️", followers: "88K" },
+      { platform: "LinkedIn", icon: "💼", followers: "193K" },
+      { platform: "Mastodon", icon: "🐘", followers: "44K" }
+    ],
+    points: [
+      "What she saw inside Big Tech that changed her forever",
+      "The personal cost of blowing the whistle",
+      "How social media platforms actually make decisions about your feed",
+      "What real digital privacy legislation would look like"
+    ],
+    availability: false,
+    followingNum: 621000
+  },
+  {
+    name: "Coach D.J. Watts",
+    initials: "DW",
+    title: "Olympic Strength Coach & Mindset Expert",
+    categories: ["Sports","Health"],
+    story: "D.J. has trained seven Olympic gold medalists across four sports. He grew up with ADHD that was never diagnosed until he was 31, and credits his 'broken brain' for the systems he built that work for elite athletes. His free YouTube series on mental performance has 50M views.",
+    social: [
+      { platform: "YouTube", icon: "▶️", followers: "2.4M" },
+      { platform: "Instagram", icon: "📸", followers: "890K" },
+      { platform: "TikTok", icon: "🎵", followers: "1.6M" },
+      { platform: "X (Twitter)", icon: "🐦", followers: "74K" }
+    ],
+    points: [
+      "The mindset routines of Olympic champions",
+      "What ADHD taught him about focus and performance",
+      "Why most people train their body but neglect their nervous system",
+      "How to peak at the right moment — on any stage"
+    ],
+    availability: true,
+    followingNum: 2400000
+  },
+  {
+    name: "Leila Nazari",
+    initials: "LN",
+    title: "Afghan Refugee → Harvard Law Professor",
+    categories: ["Business","Spirituality"],
+    story: "Leila fled Kabul at age 8 with her mother and younger brother. They spent three years in refugee camps before landing in Minnesota with $200 and no English. She graduated Harvard Law at 26 and now teaches immigration law — and is one of the most sought-after legal commentators in the country.",
+    social: [
+      { platform: "Instagram", icon: "📸", followers: "156K" },
+      { platform: "LinkedIn", icon: "💼", followers: "238K" },
+      { platform: "X (Twitter)", icon: "🐦", followers: "112K" },
+      { platform: "YouTube", icon: "▶️", followers: "67K" }
+    ],
+    points: [
+      "What refugee camp life actually looks like — day to day",
+      "How she kept hope without a guaranteed outcome",
+      "The U.S. immigration system from the inside: what works, what doesn't",
+      "What America looks like through a refugee's eyes"
+    ],
+    availability: true,
+    followingNum: 238000
+  },
+  {
+    name: "Dez Fontaine",
+    initials: "DF",
+    title: "Stand-Up Comedian & Addiction Survivor",
+    categories: ["Health","True Crime"],
+    story: "Dez blacked out on the night he became a viral sensation — literally. He was three years deep into heroin addiction and doesn't remember the set that launched his career. He's been sober for six years and now uses comedy to pull the curtain back on addiction, shame, and what recovery really looks like.",
+    social: [
+      { platform: "TikTok", icon: "🎵", followers: "4.1M" },
+      { platform: "Instagram", icon: "📸", followers: "1.2M" },
+      { platform: "YouTube", icon: "▶️", followers: "632K" },
+      { platform: "X (Twitter)", icon: "🐦", followers: "88K" }
+    ],
+    points: [
+      "How he got famous on his worst night",
+      "Why comedy and trauma are inseparable for him",
+      "What addiction recovery doesn't look like in movies",
+      "Using humor to destigmatize the hardest conversations"
+    ],
+    availability: true,
+    followingNum: 4100000
+  },
+  {
+    name: "Nina Park",
+    initials: "NP",
+    title: "Neuroscientist & Sleep Researcher",
+    categories: ["Health","Tech"],
+    story: "Nina runs one of the top sleep research labs in the U.S. and has published over 60 peer-reviewed studies. But she's not your typical scientist — she's spoken at TED, gone viral on TikTok, and speaks about what bad sleep is doing to our brains in ways anyone can actually understand.",
+    social: [
+      { platform: "TikTok", icon: "🎵", followers: "2.9M" },
+      { platform: "Instagram", icon: "📸", followers: "440K" },
+      { platform: "YouTube", icon: "▶️", followers: "318K" },
+      { platform: "LinkedIn", icon: "💼", followers: "176K" }
+    ],
+    points: [
+      "What happens to your brain after one bad night of sleep",
+      "Why the 8-hour rule is more complicated than it sounds",
+      "The link between sleep deprivation and mental illness",
+      "What she found that surprised even her research team"
+    ],
+    availability: true,
+    followingNum: 2900000
+  },
+  {
+    name: "Samuel Booker",
+    initials: "SB",
+    title: "Navy SEAL Veteran & Trauma Therapist",
+    categories: ["Sports","Health"],
+    story: "Samuel served three combat deployments as a SEAL and came home to find himself completely incapable of sitting still or feeling safe. His journey from PTSD to becoming a licensed somatic therapist took eight years. He now treats veterans and first responders and is writing his first book.",
+    social: [
+      { platform: "Instagram", icon: "📸", followers: "223K" },
+      { platform: "YouTube", icon: "▶️", followers: "512K" },
+      { platform: "TikTok", icon: "🎵", followers: "1.4M" },
+      { platform: "LinkedIn", icon: "💼", followers: "61K" }
+    ],
+    points: [
+      "What combat actually does to the human nervous system",
+      "Why 'toughness' is the enemy of healing for veterans",
+      "The moment he realized he needed help — and what it took to ask",
+      "Somatic therapy explained for people who hate therapy"
+    ],
+    availability: true,
+    followingNum: 512000
+  },
+  {
+    name: "Camille Durant",
+    initials: "CD",
+    title: "Serial Founder & Burnout Coach",
+    categories: ["Business","Finance"],
+    story: "Camille built and sold two SaaS companies before 34, then spent eight months unable to get out of bed. Now she coaches founders on sustainable ambition and has become one of the most honest voices in startup culture — calling out hustle porn and the mythology around building companies.",
+    social: [
+      { platform: "LinkedIn", icon: "💼", followers: "340K" },
+      { platform: "Instagram", icon: "📸", followers: "187K" },
+      { platform: "Substack", icon: "✍️", followers: "54K" },
+      { platform: "X (Twitter)", icon: "🐦", followers: "91K" }
+    ],
+    points: [
+      "The exit that almost broke her — and why she doesn't regret it",
+      "Why startup culture is lying to you about what success feels like",
+      "The difference between ambition and addiction",
+      "What she'd tell her 28-year-old self about building companies"
+    ],
+    availability: false,
+    followingNum: 340000
+  }
+];
+
+let activeCategory = '';
+let filteredGuests = [...guests];
+
+function renderCards(data) {
+  const grid = document.getElementById('guestGrid');
+  document.getElementById('resultCount').textContent = data.length;
+  grid.innerHTML = '';
+  if (data.length === 0) {
+    grid.innerHTML = '<p style="color:var(--muted);grid-column:1/-1;text-align:center;padding:60px 0;">No guests match your search. Try different filters.</p>';
+    return;
+  }
+  data.forEach((g, i) => {
+    const card = document.createElement('div');
+    card.className = 'guest-card';
+    card.style.animationDelay = (i * 0.05) + 's';
+    card.onclick = () => openModal(g);
+    const topSocial = g.social.slice(0, 3);
+    card.innerHTML = `
+      <div class="card-top">
+        <div class="avatar">${g.initials}</div>
+        <div class="card-identity">
+          <div class="guest-name">${g.name}</div>
+          <div class="guest-title">${g.title}</div>
+          <div class="topic-tags">
+            ${g.categories.map(c => `<span class="topic-tag">${c}</span>`).join('')}
+          </div>
+        </div>
+      </div>
+      <p class="card-story">${g.story}</p>
+      <div class="card-social">
+        ${topSocial.map(s => `
+          <div class="social-item">
+            <div class="social-icon">${s.icon}</div>
+            <span><span class="social-count">${s.followers}</span> ${s.platform}</span>
+          </div>
+        `).join('')}
+      </div>
+      <div class="card-footer">
+        <div class="availability">
+          ${g.availability
+            ? `<div class="avail-dot"></div> Available Now`
+            : `<span style="color:var(--muted);">⏳ Waitlisted</span>`}
+        </div>
+        <button class="btn-view" onclick="event.stopPropagation(); openModal(guests[${guests.indexOf(g)}])">View Profile</button>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function filterGuests() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  const cat = document.getElementById('categoryFilter').value;
+  const following = document.getElementById('followingFilter').value;
+  const effectiveCat = cat || activeCategory;
+
+  filteredGuests = guests.filter(g => {
+    const matchQ = !q || g.name.toLowerCase().includes(q) || g.title.toLowerCase().includes(q)
+      || g.story.toLowerCase().includes(q) || g.categories.some(c => c.toLowerCase().includes(q))
+      || g.points.some(p => p.toLowerCase().includes(q));
+    const matchCat = !effectiveCat || g.categories.some(c => c === effectiveCat || c.startsWith(effectiveCat));
+    let matchFollow = true;
+    if (following === '10k') matchFollow = g.followingNum >= 10000;
+    else if (following === '50k') matchFollow = g.followingNum >= 50000;
+    else if (following === '100k') matchFollow = g.followingNum >= 100000;
+    else if (following === '500k') matchFollow = g.followingNum >= 500000;
+    return matchQ && matchCat && matchFollow;
+  });
+  renderCards(filteredGuests);
+}
+
+function quickFilter(el, cat) {
+  document.querySelectorAll('.tag').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  activeCategory = cat;
+  document.getElementById('categoryFilter').value = '';
+  filterGuests();
+}
+
+function openModal(g) {
+  document.getElementById('mAvatar').textContent = g.initials;
+  document.getElementById('mName').textContent = g.name;
+  document.getElementById('mTitle').textContent = g.title;
+  document.getElementById('mStory').textContent = g.story;
+  document.getElementById('mSocial').innerHTML = g.social.map(s => `
+    <div class="social-card">
+      <div style="font-size:1.4rem">${s.icon}</div>
+      <div>
+        <div class="social-platform">${s.platform}</div>
+        <div class="social-followers">${s.followers}</div>
+        <div class="social-flabel">followers</div>
+      </div>
+    </div>
+  `).join('');
+  document.getElementById('mPoints').innerHTML = g.points.map(p => `
+    <div class="talking-point"><div class="tp-bullet"></div><span>${p}</span></div>
+  `).join('');
+  document.getElementById('modalOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal(e) {
+  if (e.target === document.getElementById('modalOverlay')) closeModalDirect();
+}
+
+function closeModalDirect() {
+  document.getElementById('modalOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function openJoinModal() {
+  window.location.href = 'podcircuit-profile.html';
+}
+
+// ── LOAD APPROVED GUESTS FROM LOCAL STORAGE ──
+function loadApprovedGuests() {
+  try {
+    const stored = JSON.parse(localStorage.getItem('podcircuit_approved') || '[]');
+    stored.forEach(app => {
+      // Convert application format to guest card format
+      const socials = [];
+      const icons = { Instagram:'📸', TikTok:'🎵', YouTube:'▶️', 'X (Twitter)':'🐦', LinkedIn:'💼' };
+      if (app.igFollowers) socials.push({ platform:'Instagram', icon:'📸', followers: fmtNum(app.igFollowers) });
+      if (app.ttFollowers) socials.push({ platform:'TikTok', icon:'🎵', followers: fmtNum(app.ttFollowers) });
+      if (app.ytSubs)      socials.push({ platform:'YouTube', icon:'▶️', followers: fmtNum(app.ytSubs) });
+      if (app.twFollowers) socials.push({ platform:'X (Twitter)', icon:'🐦', followers: fmtNum(app.twFollowers) });
+      if (app.liFollowers) socials.push({ platform:'LinkedIn', icon:'💼', followers: fmtNum(app.liFollowers) });
+      const maxFollowing = Math.max(app.igFollowers||0, app.ttFollowers||0, app.ytSubs||0, app.twFollowers||0, app.liFollowers||0);
+      const fn = app.firstName || ''; const ln = app.lastName || '';
+      guests.unshift({
+        name: fn + ' ' + ln,
+        initials: (fn[0]||'') + (ln[0]||''),
+        title: app.title || '',
+        categories: app.categories || [],
+        story: app.story || '',
+        social: socials,
+        points: app.points || [],
+        availability: app.availability === 'available',
+        followingNum: maxFollowing
+      });
+    });
+  } catch(e) {}
+}
+
+function fmtNum(n) {
+  n = parseInt(n);
+  if (n >= 1000000) return (n/1000000).toFixed(1).replace(/\.0$/,'') + 'M';
+  if (n >= 1000) return (n/1000).toFixed(0) + 'K';
+  return String(n);
+}
+
+loadApprovedGuests();
+renderCards(guests);
+</script>
+</body>
+</html>

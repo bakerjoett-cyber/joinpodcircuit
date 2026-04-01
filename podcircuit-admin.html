@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — PodCircuit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0e0c0a;
+    --paper: #f5f0e8;
+    --cream: #ede7d9;
+    --gold: #c9a84c;
+    --gold-light: #f0d98a;
+    --teal: #1a6b6b;
+    --teal-light: #e8f4f4;
+    --muted: #7a7060;
+    --border: #d8d0c0;
+    --approve: #1a7a3c;
+    --approve-bg: #e8f5ed;
+    --reject: #b84a2e;
+    --reject-bg: #fdf0ed;
+    --pending: #b07c1a;
+    --pending-bg: #fdf6e3;
+    --sidebar: #161412;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: #1a1714;
+    color: var(--paper);
+    min-height: 100vh;
+    display: flex;
+  }
+
+  /* ── LOGIN SCREEN ── */
+  .login-screen {
+    position: fixed; inset: 0;
+    background: var(--ink);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 999;
+  }
+
+  .login-box {
+    background: #1e1b18;
+    border: 1.5px solid #333;
+    border-radius: 16px;
+    padding: 48px 44px;
+    width: 380px;
+    text-align: center;
+  }
+
+  .login-logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.5rem;
+    color: var(--gold);
+    margin-bottom: 6px;
+  }
+
+  .login-sub { color: #666; font-size: 0.82rem; margin-bottom: 36px; }
+
+  .login-field { display: flex; flex-direction: column; gap: 7px; margin-bottom: 16px; text-align: left; }
+
+  .login-field label { font-size: 0.8rem; font-weight: 600; color: #aaa; letter-spacing: 0.3px; }
+
+  .login-field input {
+    background: #111;
+    border: 1.5px solid #333;
+    color: var(--paper);
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .login-field input:focus { border-color: var(--gold); }
+
+  .login-btn {
+    width: 100%;
+    background: var(--gold);
+    color: var(--ink);
+    border: none;
+    padding: 13px;
+    border-radius: 8px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: background 0.15s;
+  }
+
+  .login-btn:hover { background: var(--gold-light); }
+
+  .login-error { color: #e74c3c; font-size: 0.8rem; margin-top: 10px; display: none; }
+  .login-hint { color: #555; font-size: 0.75rem; margin-top: 20px; }
+  .login-hint strong { color: #777; }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: 230px;
+    background: var(--sidebar);
+    border-right: 1px solid #2a2520;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+  }
+
+  .sidebar-logo {
+    padding: 24px 22px 20px;
+    border-bottom: 1px solid #2a2520;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.15rem;
+    color: var(--gold);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .sidebar-logo-dot {
+    width: 8px; height: 8px;
+    background: var(--gold);
+    border-radius: 50%;
+  }
+
+  .sidebar-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: #444;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 20px 22px 8px;
+  }
+
+  .sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 22px;
+    color: #666;
+    cursor: pointer;
+    font-size: 0.88rem;
+    font-weight: 500;
+    border-radius: 0;
+    transition: all 0.15s;
+    border-left: 3px solid transparent;
+    text-decoration: none;
+  }
+
+  .sidebar-item:hover { color: #ccc; background: rgba(255,255,255,0.03); }
+
+  .sidebar-item.active {
+    color: var(--gold);
+    border-left-color: var(--gold);
+    background: rgba(201,168,76,0.06);
+  }
+
+  .sidebar-badge {
+    margin-left: auto;
+    background: var(--pending);
+    color: white;
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 10px;
+    min-width: 20px;
+    text-align: center;
+  }
+
+  .sidebar-badge.green { background: var(--approve); }
+
+  .sidebar-footer {
+    margin-top: auto;
+    padding: 20px 22px;
+    border-top: 1px solid #2a2520;
+    font-size: 0.78rem;
+    color: #444;
+  }
+
+  .logout-btn {
+    background: none;
+    border: 1px solid #333;
+    color: #666;
+    padding: 7px 14px;
+    border-radius: 6px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.8rem;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 10px;
+    transition: all 0.15s;
+  }
+
+  .logout-btn:hover { border-color: #555; color: #aaa; }
+
+  /* ── MAIN CONTENT ── */
+  .main-content {
+    flex: 1;
+    overflow-y: auto;
+    background: #1a1714;
+  }
+
+  .page { display: none; padding: 32px 36px; }
+  .page.active { display: block; animation: fadeIn 0.25s ease; }
+
+  @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+  /* ── TOP BAR ── */
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 28px;
+  }
+
+  .page-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.6rem;
+    letter-spacing: -0.5px;
+    color: var(--paper);
+    margin-bottom: 4px;
+  }
+
+  .page-subtitle { color: #666; font-size: 0.85rem; font-weight: 300; }
+
+  /* ── STAT CARDS ── */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  .stat-card {
+    background: #221f1b;
+    border: 1px solid #2e2a25;
+    border-radius: 10px;
+    padding: 20px 22px;
+  }
+
+  .stat-card-val {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.9rem;
+    color: var(--paper);
+    letter-spacing: -1px;
+    margin-bottom: 4px;
+  }
+
+  .stat-card-label { font-size: 0.78rem; color: #666; font-weight: 400; }
+  .stat-card.gold .stat-card-val { color: var(--gold); }
+  .stat-card.teal .stat-card-val { color: #4db8b8; }
+  .stat-card.green .stat-card-val { color: #5dab6e; }
+  .stat-card.red .stat-card-val { color: #e07060; }
+
+  /* ── FILTER BAR ── */
+  .filter-bar {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+
+  .filter-tab {
+    background: transparent;
+    border: 1px solid #333;
+    color: #666;
+    padding: 7px 16px;
+    border-radius: 20px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .filter-tab:hover { border-color: #555; color: #aaa; }
+
+  .filter-tab.active {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .search-admin {
+    margin-left: auto;
+    background: #221f1b;
+    border: 1px solid #333;
+    color: var(--paper);
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    outline: none;
+    width: 220px;
+    transition: border-color 0.2s;
+  }
+
+  .search-admin:focus { border-color: var(--gold); }
+  .search-admin::placeholder { color: #444; }
+
+  /* ── APPLICATION TABLE ── */
+  .app-table {
+    background: #221f1b;
+    border: 1px solid #2e2a25;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .app-table-head {
+    display: grid;
+    grid-template-columns: 2fr 1.5fr 1fr 1fr 1fr 120px;
+    gap: 12px;
+    padding: 12px 20px;
+    background: #1a1714;
+    border-bottom: 1px solid #2e2a25;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #555;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .app-row {
+    display: grid;
+    grid-template-columns: 2fr 1.5fr 1fr 1fr 1fr 120px;
+    gap: 12px;
+    padding: 16px 20px;
+    border-bottom: 1px solid #2a2520;
+    align-items: center;
+    transition: background 0.15s;
+    cursor: pointer;
+  }
+
+  .app-row:last-child { border-bottom: none; }
+  .app-row:hover { background: rgba(255,255,255,0.02); }
+
+  .app-name {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .app-avatar {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    background: rgba(201,168,76,0.12);
+    border: 1.5px solid #3a3530;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.82rem;
+    color: var(--gold);
+    flex-shrink: 0;
+  }
+
+  .app-name-text {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--paper);
+  }
+
+  .app-title-text { font-size: 0.75rem; color: #666; margin-top: 1px; }
+
+  .app-cell { font-size: 0.85rem; color: #aaa; }
+
+  .app-cats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .app-cat {
+    background: rgba(26,107,107,0.2);
+    color: #4db8b8;
+    font-size: 0.68rem;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 10px;
+  }
+
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.74rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 12px;
+    letter-spacing: 0.3px;
+  }
+
+  .status-badge.pending { background: var(--pending-bg); color: var(--pending); }
+  .status-badge.approved { background: var(--approve-bg); color: var(--approve); }
+  .status-badge.rejected { background: var(--reject-bg); color: var(--reject); }
+
+  .action-btns {
+    display: flex;
+    gap: 6px;
+  }
+
+  .btn-approve, .btn-reject {
+    border: none;
+    padding: 6px 12px;
+    border-radius: 5px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.72rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+
+  .btn-approve {
+    background: rgba(26,122,60,0.2);
+    color: #5dab6e;
+    border: 1px solid rgba(26,122,60,0.3);
+  }
+
+  .btn-approve:hover { background: var(--approve); color: white; }
+
+  .btn-reject {
+    background: rgba(184,74,46,0.15);
+    color: #e07060;
+    border: 1px solid rgba(184,74,46,0.2);
+  }
+
+  .btn-reject:hover { background: var(--reject); color: white; }
+
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #444;
+  }
+
+  .empty-icon { font-size: 2.5rem; margin-bottom: 12px; }
+  .empty-text { font-size: 0.9rem; }
+
+  /* ── DETAIL DRAWER ── */
+  .drawer-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 200;
+    display: none;
+    backdrop-filter: blur(3px);
+  }
+
+  .drawer-overlay.open { display: block; }
+
+  .drawer {
+    position: fixed;
+    top: 0; right: 0;
+    width: 520px;
+    height: 100vh;
+    background: #1e1b18;
+    border-left: 1px solid #2e2a25;
+    overflow-y: auto;
+    z-index: 201;
+    transform: translateX(100%);
+    transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  .drawer.open { transform: translateX(0); }
+
+  .drawer-header {
+    background: var(--sidebar);
+    padding: 22px 26px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    border-bottom: 1px solid #2a2520;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .drawer-avatar {
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    background: rgba(201,168,76,0.1);
+    border: 2px solid var(--gold);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.2rem;
+    color: var(--gold);
+    flex-shrink: 0;
+  }
+
+  .drawer-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--paper);
+  }
+
+  .drawer-title { color: #888; font-size: 0.82rem; font-weight: 300; }
+
+  .drawer-close {
+    margin-left: auto;
+    background: rgba(255,255,255,0.05);
+    border: none;
+    color: #888;
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1rem;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+  }
+
+  .drawer-close:hover { background: rgba(255,255,255,0.1); color: var(--paper); }
+
+  .drawer-body { padding: 22px 26px; }
+
+  .drawer-section { margin-bottom: 24px; }
+
+  .drawer-section-title {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #555;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #2a2520;
+  }
+
+  .drawer-text { font-size: 0.88rem; color: #bbb; line-height: 1.7; font-weight: 300; }
+
+  .drawer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  .drawer-kv {
+    background: #161412;
+    border: 1px solid #2a2520;
+    border-radius: 7px;
+    padding: 10px 13px;
+  }
+
+  .drawer-kv-label { font-size: 0.68rem; color: #555; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 3px; }
+  .drawer-kv-val { font-size: 0.88rem; color: var(--paper); font-weight: 500; }
+  .drawer-kv-val.green { color: #5dab6e; }
+
+  .drawer-social-row {
+    display: flex; justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #2a2520;
+    font-size: 0.85rem;
+  }
+
+  .drawer-social-row:last-child { border-bottom: none; }
+  .drawer-social-name { color: #888; display: flex; align-items: center; gap: 8px; }
+  .drawer-social-count { color: #4db8b8; font-weight: 600; font-family: 'Syne', sans-serif; }
+
+  .drawer-point {
+    display: flex; gap: 10px; align-items: flex-start;
+    font-size: 0.85rem; color: #bbb;
+    padding: 5px 0;
+  }
+
+  .drawer-point-dot { color: var(--gold); font-size: 0.7rem; margin-top: 4px; flex-shrink: 0; }
+
+  .drawer-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid #2a2520;
+  }
+
+  .drawer-approve {
+    flex: 1;
+    background: var(--approve);
+    color: white;
+    border: none;
+    padding: 13px;
+    border-radius: 8px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.88rem;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .drawer-approve:hover { background: #156030; }
+
+  .drawer-reject {
+    flex: 1;
+    background: rgba(184,74,46,0.15);
+    color: #e07060;
+    border: 1px solid rgba(184,74,46,0.3);
+    padding: 13px;
+    border-radius: 8px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.88rem;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .drawer-reject:hover { background: var(--reject); color: white; border-color: var(--reject); }
+
+  /* ── APPROVED PAGE ── */
+  .approved-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+  }
+
+  .approved-card {
+    background: #221f1b;
+    border: 1px solid #2e2a25;
+    border-radius: 10px;
+    padding: 18px 20px;
+    transition: border-color 0.15s;
+    cursor: pointer;
+  }
+
+  .approved-card:hover { border-color: var(--gold); }
+
+  .approved-card-top {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 12px;
+  }
+
+  .approved-card-avatar {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: rgba(201,168,76,0.1);
+    border: 1.5px solid #3a3530;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--gold);
+    flex-shrink: 0;
+  }
+
+  .approved-card-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.92rem;
+    color: var(--paper);
+  }
+
+  .approved-card-title { font-size: 0.75rem; color: #666; margin-top: 2px; }
+
+  .approved-card-story {
+    font-size: 0.8rem; color: #777;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: 12px;
+    line-height: 1.5;
+  }
+
+  .approved-card-footer {
+    display: flex; justify-content: space-between; align-items: center;
+  }
+
+  .approved-cats { display: flex; gap: 4px; flex-wrap: wrap; }
+
+  .btn-remove {
+    background: none;
+    border: 1px solid #333;
+    color: #555;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 0.72rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .btn-remove:hover { border-color: var(--reject); color: #e07060; }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed;
+    bottom: 28px; right: 28px;
+    background: #2a2520;
+    border: 1px solid #3a3530;
+    color: var(--paper);
+    padding: 14px 20px;
+    border-radius: 10px;
+    font-size: 0.88rem;
+    font-weight: 500;
+    z-index: 999;
+    display: none;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+    animation: slideToast 0.3s ease;
+  }
+
+  @keyframes slideToast {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  .toast.show { display: flex; }
+  .toast.green { border-color: var(--approve); }
+  .toast.red { border-color: var(--reject); }
+
+  @media (max-width: 900px) {
+    .sidebar { display: none; }
+    .app-table-head, .app-row { grid-template-columns: 2fr 1fr 100px; }
+    .app-table-head > *:nth-child(3),
+    .app-table-head > *:nth-child(4),
+    .app-row > *:nth-child(3),
+    .app-row > *:nth-child(4) { display: none; }
+    .drawer { width: 100%; }
+    .stats-row { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">🎙 PodCircuit</div>
+    <div class="login-sub">Admin Dashboard</div>
+    <div class="login-field">
+      <label>Username</label>
+      <input type="text" id="loginUser" placeholder="admin" onkeydown="if(event.key==='Enter') doLogin()">
+    </div>
+    <div class="login-field">
+      <label>Password</label>
+      <input type="password" id="loginPass" placeholder="••••••••" onkeydown="if(event.key==='Enter') doLogin()">
+    </div>
+    <button class="login-btn" onclick="doLogin()">Sign In</button>
+    <div class="login-error" id="loginErr">Incorrect username or password.</div>
+    <div class="login-hint">Default credentials: <strong>admin</strong> / <strong>podcircuit2026</strong><br>🔧 Developer: change these before going live.</div>
+  </div>
+</div>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="sidebar-logo">
+    <div class="sidebar-logo-dot"></div>
+    PodCircuit
+  </div>
+  <div class="sidebar-label">Applications</div>
+  <div class="sidebar-item active" onclick="showPage('pending')">
+    ⏳ Pending Review
+    <span class="sidebar-badge" id="pendingBadge">0</span>
+  </div>
+  <div class="sidebar-item" onclick="showPage('approved')">
+    ✅ Approved Guests
+    <span class="sidebar-badge green" id="approvedBadge">0</span>
+  </div>
+  <div class="sidebar-item" onclick="showPage('rejected')">
+    ❌ Rejected
+  </div>
+  <div class="sidebar-label">Overview</div>
+  <div class="sidebar-item" onclick="showPage('dashboard')">
+    📊 Dashboard
+  </div>
+  <a class="sidebar-item" href="podcast-circuit.html" target="_blank">
+    🌐 View Live Site
+  </a>
+  <div class="sidebar-footer">
+    Logged in as <strong style="color:#aaa;">admin</strong>
+    <button class="logout-btn" onclick="doLogout()">Sign Out</button>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main-content">
+
+  <!-- DASHBOARD PAGE -->
+  <div class="page active" id="page-dashboard">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Dashboard</div>
+        <div class="page-subtitle">Overview of all guest applications</div>
+      </div>
+    </div>
+    <div class="stats-row">
+      <div class="stat-card gold">
+        <div class="stat-card-val" id="stat-pending">0</div>
+        <div class="stat-card-label">Pending Review</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-card-val" id="stat-approved">0</div>
+        <div class="stat-card-label">Approved & Live</div>
+      </div>
+      <div class="stat-card red">
+        <div class="stat-card-val" id="stat-rejected">0</div>
+        <div class="stat-card-label">Rejected</div>
+      </div>
+      <div class="stat-card teal">
+        <div class="stat-card-val" id="stat-total">0</div>
+        <div class="stat-card-label">Total Applications</div>
+      </div>
+    </div>
+    <div style="background:#221f1b;border:1px solid #2e2a25;border-radius:12px;padding:32px;text-align:center;color:#555;">
+      <div style="font-size:2rem;margin-bottom:12px;">📋</div>
+      <div style="font-size:0.9rem;">Recent activity will appear here once applications come in.</div>
+    </div>
+  </div>
+
+  <!-- PENDING PAGE -->
+  <div class="page" id="page-pending">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Pending Review</div>
+        <div class="page-subtitle">Approve or reject guest applications before they go live</div>
+      </div>
+    </div>
+    <div class="filter-bar">
+      <button class="filter-tab active" onclick="setFilter('all', this)">All</button>
+      <button class="filter-tab" onclick="setFilter('Business', this)">Business</button>
+      <button class="filter-tab" onclick="setFilter('Health', this)">Health</button>
+      <button class="filter-tab" onclick="setFilter('Tech', this)">Tech</button>
+      <button class="filter-tab" onclick="setFilter('Sports', this)">Sports</button>
+      <input class="search-admin" type="text" placeholder="Search by name or keyword..." id="pendingSearch" oninput="renderPending()">
+    </div>
+    <div class="app-table">
+      <div class="app-table-head">
+        <div>Applicant</div>
+        <div>Categories</div>
+        <div>Top Following</div>
+        <div>Location</div>
+        <div>Status</div>
+        <div>Actions</div>
+      </div>
+      <div id="pendingList"></div>
+    </div>
+  </div>
+
+  <!-- APPROVED PAGE -->
+  <div class="page" id="page-approved">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Approved Guests</div>
+        <div class="page-subtitle">These profiles are live on the main site</div>
+      </div>
+    </div>
+    <div class="approved-grid" id="approvedList"></div>
+  </div>
+
+  <!-- REJECTED PAGE -->
+  <div class="page" id="page-rejected">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Rejected Applications</div>
+        <div class="page-subtitle">These were declined — you can re-approve them at any time</div>
+      </div>
+    </div>
+    <div class="app-table">
+      <div class="app-table-head">
+        <div>Applicant</div>
+        <div>Categories</div>
+        <div>Top Following</div>
+        <div>Location</div>
+        <div>Status</div>
+        <div>Actions</div>
+      </div>
+      <div id="rejectedList"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- DETAIL DRAWER -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-header">
+    <div class="drawer-avatar" id="d-avatar"></div>
+    <div>
+      <div class="drawer-name" id="d-name"></div>
+      <div class="drawer-title" id="d-title"></div>
+    </div>
+    <button class="drawer-close" onclick="closeDrawer()">✕</button>
+  </div>
+  <div class="drawer-body">
+    <div class="drawer-section">
+      <div class="drawer-section-title">Contact</div>
+      <div class="drawer-grid">
+        <div class="drawer-kv"><div class="drawer-kv-label">Email</div><div class="drawer-kv-val" id="d-email"></div></div>
+        <div class="drawer-kv"><div class="drawer-kv-label">Phone</div><div class="drawer-kv-val" id="d-phone"></div></div>
+        <div class="drawer-kv"><div class="drawer-kv-label">City</div><div class="drawer-kv-val" id="d-city"></div></div>
+        <div class="drawer-kv"><div class="drawer-kv-label">Format</div><div class="drawer-kv-val" id="d-format"></div></div>
+        <div class="drawer-kv"><div class="drawer-kv-label">Podcast Exp.</div><div class="drawer-kv-val" id="d-exp"></div></div>
+        <div class="drawer-kv"><div class="drawer-kv-label">Availability</div><div class="drawer-kv-val green" id="d-avail"></div></div>
+      </div>
+    </div>
+    <div class="drawer-section">
+      <div class="drawer-section-title">Their Story</div>
+      <p class="drawer-text" id="d-story"></p>
+    </div>
+    <div class="drawer-section">
+      <div class="drawer-section-title">Turning Point</div>
+      <p class="drawer-text" id="d-turning"></p>
+    </div>
+    <div class="drawer-section">
+      <div class="drawer-section-title">Social Media</div>
+      <div id="d-social"></div>
+    </div>
+    <div class="drawer-section">
+      <div class="drawer-section-title">Talking Points</div>
+      <div id="d-points"></div>
+    </div>
+    <div class="drawer-section" id="d-clip-section">
+      <div class="drawer-section-title">Media Clip</div>
+      <a id="d-clip" href="#" target="_blank" style="color:#4db8b8;font-size:0.85rem;"></a>
+    </div>
+    <div class="drawer-actions" id="d-actions"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── AUTH ──
+const ADMIN_USER = 'admin';
+const ADMIN_PASS = 'podcircuit2026'; // 🔧 DEVELOPER: change before going live
+
+function doLogin() {
+  const u = document.getElementById('loginUser').value;
+  const p = document.getElementById('loginPass').value;
+  if (u === ADMIN_USER && p === ADMIN_PASS) {
+    document.getElementById('loginScreen').style.display = 'none';
+    init();
+  } else {
+    document.getElementById('loginErr').style.display = 'block';
+  }
+}
+
+function doLogout() {
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('loginUser').value = '';
+  document.getElementById('loginPass').value = '';
+}
+
+// ── DATA ──
+function getApps(status) {
+  try {
+    const key = status === 'approved' ? 'podcircuit_approved'
+              : status === 'rejected' ? 'podcircuit_rejected'
+              : 'podcircuit_pending';
+    return JSON.parse(localStorage.getItem(key) || '[]');
+  } catch(e) { return []; }
+}
+
+function saveApps(status, arr) {
+  const key = status === 'approved' ? 'podcircuit_approved'
+            : status === 'rejected' ? 'podcircuit_rejected'
+            : 'podcircuit_pending';
+  localStorage.setItem(key, JSON.stringify(arr));
+}
+
+function removeFromList(id, status) {
+  const arr = getApps(status).filter(a => a.id !== id);
+  saveApps(status, arr);
+}
+
+function getById(id) {
+  for (const s of ['pending','approved','rejected']) {
+    const found = getApps(s).find(a => a.id === id);
+    if (found) return { app: found, status: s };
+  }
+  return null;
+}
+
+// ── ACTIONS ──
+function approveApp(id, e) {
+  if (e) e.stopPropagation();
+  const found = getById(id);
+  if (!found) return;
+  removeFromList(id, found.status);
+  const approved = getApps('approved');
+  approved.push({ ...found.app, status: 'approved' });
+  saveApps('approved', approved);
+  closeDrawer();
+  init();
+  showToast('✅ Guest approved and now live on the site!', 'green');
+}
+
+function rejectApp(id, e) {
+  if (e) e.stopPropagation();
+  const found = getById(id);
+  if (!found) return;
+  removeFromList(id, found.status);
+  const rejected = getApps('rejected');
+  rejected.push({ ...found.app, status: 'rejected' });
+  saveApps('rejected', rejected);
+  closeDrawer();
+  init();
+  showToast('❌ Application rejected.', 'red');
+}
+
+function removeApproved(id, e) {
+  if (e) e.stopPropagation();
+  removeFromList(id, 'approved');
+  init();
+  showToast('Removed from live site.', '');
+}
+
+// ── RENDER ──
+let currentFilter = 'all';
+
+function setFilter(f, el) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderPending();
+}
+
+function fmtFollowers(app) {
+  const max = Math.max(app.igFollowers||0, app.ttFollowers||0, app.ytSubs||0, app.twFollowers||0, app.liFollowers||0);
+  if (!max) return '—';
+  if (max >= 1000000) return (max/1000000).toFixed(1) + 'M';
+  if (max >= 1000) return Math.round(max/1000) + 'K';
+  return String(max);
+}
+
+function renderList(apps, containerId, showApprove, showReject, showRestore) {
+  const el = document.getElementById(containerId);
+  if (!apps.length) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-text">No applications here yet.</div></div>`;
+    return;
+  }
+  el.innerHTML = apps.map(app => {
+    const fn = app.firstName || ''; const ln = app.lastName || '';
+    const initials = (fn[0]||'') + (ln[0]||'');
+    const cats = (app.categories||[]).slice(0,2).map(c => `<span class="app-cat">${c}</span>`).join('');
+    const statusClass = app.status || 'pending';
+    const statusLabel = { pending:'⏳ Pending', approved:'✅ Approved', rejected:'❌ Rejected' }[statusClass] || statusClass;
+    const actions = [
+      showApprove ? `<button class="btn-approve" onclick="approveApp('${app.id}',event)">✓ Approve</button>` : '',
+      showReject  ? `<button class="btn-reject"  onclick="rejectApp('${app.id}',event)">✕ Reject</button>`   : '',
+      showRestore ? `<button class="btn-approve" onclick="approveApp('${app.id}',event)">↩ Restore</button>`  : ''
+    ].filter(Boolean).join('');
+    return `
+      <div class="app-row" onclick="openDrawer('${app.id}')">
+        <div class="app-name">
+          <div class="app-avatar">${initials.toUpperCase()}</div>
+          <div>
+            <div class="app-name-text">${fn} ${ln}</div>
+            <div class="app-title-text">${app.title||''}</div>
+          </div>
+        </div>
+        <div class="app-cell"><div class="app-cats">${cats}</div></div>
+        <div class="app-cell">${fmtFollowers(app)}</div>
+        <div class="app-cell">${app.city||'—'}</div>
+        <div class="app-cell"><span class="status-badge ${statusClass}">${statusLabel}</span></div>
+        <div class="action-btns">${actions}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderPending() {
+  let apps = getApps('pending');
+  const q = (document.getElementById('pendingSearch')?.value || '').toLowerCase();
+  if (currentFilter !== 'all') apps = apps.filter(a => (a.categories||[]).includes(currentFilter));
+  if (q) apps = apps.filter(a =>
+    (a.firstName+' '+a.lastName).toLowerCase().includes(q) ||
+    (a.title||'').toLowerCase().includes(q) ||
+    (a.story||'').toLowerCase().includes(q)
+  );
+  renderList(apps, 'pendingList', true, true, false);
+}
+
+function renderApproved() {
+  const apps = getApps('approved');
+  const el = document.getElementById('approvedList');
+  if (!apps.length) {
+    el.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:60px;color:#444;"><div style="font-size:2.5rem;margin-bottom:12px;">🎙</div><div>No approved guests yet. Approve applications from the Pending tab.</div></div>`;
+    return;
+  }
+  el.innerHTML = apps.map(app => {
+    const fn = app.firstName||''; const ln = app.lastName||'';
+    const initials = (fn[0]||'') + (ln[0]||'');
+    const cats = (app.categories||[]).slice(0,3).map(c => `<span class="app-cat">${c}</span>`).join('');
+    return `
+      <div class="approved-card" onclick="openDrawer('${app.id}')">
+        <div class="approved-card-top">
+          <div class="approved-card-avatar">${initials.toUpperCase()}</div>
+          <div>
+            <div class="approved-card-name">${fn} ${ln}</div>
+            <div class="approved-card-title">${app.title||''}</div>
+          </div>
+        </div>
+        <div class="approved-card-story">${app.story||''}</div>
+        <div class="approved-card-footer">
+          <div class="approved-cats">${cats}</div>
+          <button class="btn-remove" onclick="removeApproved('${app.id}',event)">Remove</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderRejected() {
+  renderList(getApps('rejected'), 'rejectedList', false, false, true);
+}
+
+function updateBadges() {
+  const p = getApps('pending').length;
+  const a = getApps('approved').length;
+  document.getElementById('pendingBadge').textContent = p;
+  document.getElementById('approvedBadge').textContent = a;
+  document.getElementById('stat-pending').textContent = p;
+  document.getElementById('stat-approved').textContent = a;
+  const r = getApps('rejected').length;
+  document.getElementById('stat-rejected').textContent = r;
+  document.getElementById('stat-total').textContent = p + a + r;
+}
+
+// ── DRAWER ──
+let drawerCurrentId = null;
+
+function openDrawer(id) {
+  const found = getById(id);
+  if (!found) return;
+  const app = found.app;
+  drawerCurrentId = id;
+  const fn = app.firstName||''; const ln = app.lastName||'';
+  document.getElementById('d-avatar').textContent = ((fn[0]||'') + (ln[0]||'')).toUpperCase();
+  document.getElementById('d-name').textContent = fn + ' ' + ln;
+  document.getElementById('d-title').textContent = app.title||'';
+  document.getElementById('d-email').textContent = app.email||'—';
+  document.getElementById('d-phone').textContent = app.phone||'—';
+  document.getElementById('d-city').textContent = app.city||'—';
+  document.getElementById('d-format').textContent = app.format||'—';
+  document.getElementById('d-exp').textContent = app.podcastExp||'—';
+  document.getElementById('d-avail').textContent = app.availability||'—';
+  document.getElementById('d-story').textContent = app.story||'—';
+  document.getElementById('d-turning').textContent = app.turningPoint||'—';
+
+  const socials = [
+    { label:'📸 Instagram', val: app.igFollowers, handle: app.igHandle },
+    { label:'🎵 TikTok', val: app.ttFollowers, handle: app.ttHandle },
+    { label:'▶️ YouTube', val: app.ytSubs },
+    { label:'🐦 X (Twitter)', val: app.twFollowers, handle: app.twHandle },
+    { label:'💼 LinkedIn', val: app.liFollowers }
+  ].filter(s => s.val > 0);
+
+  document.getElementById('d-social').innerHTML = socials.length
+    ? socials.map(s => `<div class="drawer-social-row"><span class="drawer-social-name">${s.label}${s.handle ? ' · @'+s.handle : ''}</span><span class="drawer-social-count">${s.val.toLocaleString()}</span></div>`).join('')
+    : '<span style="color:#555;font-size:0.85rem;">No social media provided</span>';
+
+  document.getElementById('d-points').innerHTML = (app.points||[]).length
+    ? (app.points||[]).map(p => `<div class="drawer-point"><span class="drawer-point-dot">●</span><span>${p}</span></div>`).join('')
+    : '<span style="color:#555;font-size:0.85rem;">No talking points provided</span>';
+
+  const clipSection = document.getElementById('d-clip-section');
+  if (app.mediaClip) {
+    clipSection.style.display = 'block';
+    const cl = document.getElementById('d-clip');
+    cl.href = app.mediaClip;
+    cl.textContent = app.mediaClip;
+  } else {
+    clipSection.style.display = 'none';
+  }
+
+  const actionsEl = document.getElementById('d-actions');
+  if (found.status === 'pending') {
+    actionsEl.innerHTML = `<button class="drawer-approve" onclick="approveApp('${id}')">✅ Approve & Go Live</button><button class="drawer-reject" onclick="rejectApp('${id}')">❌ Reject</button>`;
+  } else if (found.status === 'approved') {
+    actionsEl.innerHTML = `<button class="drawer-reject" onclick="removeApproved('${id}')">Remove from Live Site</button>`;
+  } else {
+    actionsEl.innerHTML = `<button class="drawer-approve" onclick="approveApp('${id}')">↩ Restore & Approve</button>`;
+  }
+
+  document.getElementById('drawerOverlay').classList.add('open');
+  document.getElementById('drawer').classList.add('open');
+}
+
+function closeDrawer() {
+  document.getElementById('drawerOverlay').classList.remove('open');
+  document.getElementById('drawer').classList.remove('open');
+}
+
+// ── PAGES ──
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  document.querySelectorAll('.sidebar-item').forEach(s => {
+    if (s.textContent.toLowerCase().includes(name === 'dashboard' ? 'dashboard'
+      : name === 'pending' ? 'pending' : name === 'approved' ? 'approved' : 'rejected')) {
+      s.classList.add('active');
+    }
+  });
+  if (name === 'pending') renderPending();
+  else if (name === 'approved') renderApproved();
+  else if (name === 'rejected') renderRejected();
+}
+
+// ── TOAST ──
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + type;
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+// ── DEMO DATA (so admin isn't empty on first open) ──
+function seedDemoIfEmpty() {
+  const existing = getApps('pending');
+  if (existing.length > 0) return;
+  const demos = [
+    { id:'demo_1', submittedAt: new Date().toISOString(), status:'pending', firstName:'Aaliyah', lastName:'James', email:'aaliyah@email.com', phone:'404-555-0192', title:'Single Mom → 7-Figure Real Estate Investor', city:'Atlanta, GA', story:'Raised two kids alone while working double shifts at a hospital. At 31 she bought her first duplex with $8K in savings. Five years later she owns 14 units and teaches other women how to do the same. Her IG Lives get 40K viewers.', turningPoint:'Getting evicted with two toddlers at 27 — that was the night she decided to never rent again.', achievement:'14 rental units, $2.3M portfolio, 180K Instagram followers, $0 in debt.', podcastExp:'few', format:'both', mediaClip:'', igHandle:'aaliyah.builds', igFollowers:180000, ttHandle:'aaliyahjames', ttFollowers:420000, ytSubs:0, twHandle:'', twFollowers:0, liUrl:'', liFollowers:22000, categories:['Business','Finance'], points:['How to buy your first property with under $10K','What banks look for that nobody tells you','Building wealth as a single parent','Why real estate beats the stock market for regular people'], availability:'available'},
+    { id:'demo_2', submittedAt: new Date().toISOString(), status:'pending', firstName:'Ray', lastName:'Okonkwo', email:'ray@rayokonkwo.com', phone:'', title:'Ex-Convict → Published Author & TEDx Speaker', city:'Houston, TX', story:'Ray spent 9 years in federal prison for drug distribution. Inside, he wrote a memoir longhand that an officer smuggled out to a publisher. The book sold 80,000 copies before he was released. He now speaks at schools and corporations about redemption and second chances.', turningPoint:'The night a CO slid a handwritten rejection letter from a publisher under his cell door — and he decided to rewrite the entire manuscript.', achievement:'80K books sold, 3 TEDx talks, speaking fee of $15K per event.', podcastExp:'veteran', format:'both', mediaClip:'https://youtube.com', igHandle:'rayokonkwo', igFollowers:95000, ttHandle:'', ttFollowers:0, ytSubs:210000, twHandle:'rayokonkwo', twFollowers:38000, liUrl:'', liFollowers:0, categories:['True Crime','Business'], points:['What prison culture actually looks like day-to-day','How he found purpose in the worst place imaginable','The publishing industry\'s bias against incarcerated writers','Why corporations should hire people with records'], availability:'available'},
+    { id:'demo_3', submittedAt: new Date().toISOString(), status:'pending', firstName:'Dr. Elena', lastName:'Vasquez', email:'elena@vasquezwellness.com', phone:'212-555-0847', title:'ER Doctor & Psychedelic-Assisted Therapy Researcher', city:'New York, NY', story:'Elena has worked ER shifts for 12 years while simultaneously running clinical trials on psilocybin for PTSD. She lost her brother to suicide in 2018 and has since become one of the most credible and personal voices in the psychedelic medicine space.', turningPoint:'Finding her brother. And then, two years later, watching a veteran with 20 years of PTSD cry for the first time in a psilocybin trial.', achievement:'22 peer-reviewed papers, 340K TikTok followers, featured in Time Magazine.', podcastExp:'regular', format:'remote', mediaClip:'', igHandle:'drelenavasquez', igFollowers:128000, ttHandle:'drelenavasquez', ttFollowers:340000, ytSubs:0, twHandle:'drelena', twFollowers:54000, liUrl:'', liFollowers:0, categories:['Health','Spirituality'], points:['What the science actually says about psychedelic therapy','Losing a sibling to suicide — and finding a way to help others','Why the FDA is taking psychedelics seriously now','What ER medicine teaches you about the human will to survive'], availability:'limited'}
+  ];
+  saveApps('pending', demos);
+}
+
+function init() {
+  seedDemoIfEmpty();
+  updateBadges();
+  showPage('pending');
+}
+</script>
+</body>
+</html>
