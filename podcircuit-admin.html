@@ -1,106 +1,140 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>PodCircuit Admin</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-<script src="supabase-config.js"></script>
-<style>
-  *{margin:0;padding:0;box-sizing:border-box;}
-  body{font-family:system-ui;background:#f5f0e8;}
-  .login{min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0e0c0a;}
-  .login-box{background:white;padding:40px;border-radius:20px;width:300px;}
-  input{width:100%;padding:10px;margin:8px 0;border:1px solid #ddd;border-radius:6px;}
-  button{background:#c9a84c;padding:10px;border:none;border-radius:6px;cursor:pointer;width:100%;font-weight:bold;}
-  .dashboard{display:none;}
-  .dashboard.show{display:block;}
-  .header{background:#0e0c0a;color:white;padding:16px 32px;display:flex;justify-content:space-between;}
-  .stats{display:flex;gap:20px;padding:24px;background:white;margin:20px;border-radius:12px;}
-  .stat{text-align:center;}
-  .stat-num{font-size:2rem;font-weight:bold;color:#c9a84c;}
-  .tabs{display:flex;gap:10px;padding:0 24px;}
-  .tab{background:white;border:1px solid #ddd;padding:8px 24px;border-radius:30px;cursor:pointer;}
-  .tab.active{background:#0e0c0a;color:white;}
-  .profiles{padding:24px;}
-  .card{background:white;border-radius:12px;margin-bottom:16px;overflow:hidden;}
-  .card-header{background:#f5f0e8;padding:16px 24px;display:flex;justify-content:space-between;}
-  .card-body{padding:20px 24px;display:grid;grid-template-columns:1fr 1fr;gap:20px;}
-  .card-actions{padding:16px 24px;background:#f5f0e8;display:flex;gap:10px;justify-content:flex-end;}
-  .approve{background:#27ae60;color:white;border:none;padding:6px 16px;border-radius:6px;cursor:pointer;}
-  .reject{background:#c0392b;color:white;border:none;padding:6px 16px;border-radius:6px;cursor:pointer;}
-  .pending-badge{background:#fff3e0;color:#c9a84c;padding:4px 12px;border-radius:20px;font-size:0.7rem;}
-</style>
-</head>
-<body>
-<div class="login" id="loginScreen">
-  <div class="login-box">
-    <h2>Admin Login</h2>
-    <input type="text" id="username" placeholder="Username">
-    <input type="password" id="password" placeholder="Password">
-    <button onclick="login()">Sign In</button>
-  </div>
-</div>
-<div class="dashboard" id="dashboard">
-  <div class="header"><div>🎙 PodCircuit Admin</div><button onclick="logout()" style="width:auto;background:transparent;color:#c9a84c;border:1px solid #c9a84c;">Logout</button></div>
-  <div class="stats"><div class="stat"><div class="stat-num" id="pendingCount">0</div><div>Pending</div></div><div class="stat"><div class="stat-num" id="approvedCount">0</div><div>Approved</div></div></div>
-  <div class="tabs"><button class="tab active" onclick="loadProfiles('pending')">Pending</button><button class="tab" onclick="loadProfiles('approved')">Approved</button></div>
-  <div class="profiles" id="profilesContainer">Loading...</div>
-</div>
 <script>
-let currentStatus='pending';
-if(sessionStorage.getItem('admin_logged')==='true'){
-  document.getElementById('loginScreen').style.display='none';
+let currentStatus = 'pending';
+
+if (sessionStorage.getItem('admin_logged') === 'true') {
+  document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('dashboard').classList.add('show');
   loadProfiles('pending');
 }
-async function login(){
-  let user=document.getElementById('username').value;
-  let pass=document.getElementById('password').value;
-  if(user==='admin' && pass==='podcircuit2026'){
-    sessionStorage.setItem('admin_logged','true');
-    document.getElementById('loginScreen').style.display='none';
+
+async function login() {
+  let user = document.getElementById('username').value.trim();
+  let pass = document.getElementById('password').value;
+
+  if (user === 'admin' && pass === 'podcircuit2026') {
+    sessionStorage.setItem('admin_logged', 'true');
+    document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('dashboard').classList.add('show');
     loadProfiles('pending');
-  } else alert('Wrong credentials');
+  } else {
+    alert('Wrong credentials');
+  }
 }
-function logout(){
+
+function logout() {
   sessionStorage.removeItem('admin_logged');
-  document.getElementById('loginScreen').style.display='flex';
+  document.getElementById('loginScreen').style.display = 'flex';
   document.getElementById('dashboard').classList.remove('show');
 }
-async function loadProfiles(status){
-  currentStatus=status;
-  document.querySelectorAll('.tab').forEach(btn=>btn.classList.remove('active'));
-  event.target.classList.add('active');
-  let container=document.getElementById('profilesContainer');
-  container.innerHTML='Loading...';
-  try{
-    let profiles=[];
-    if(typeof dbGetProfilesByStatus!=='undefined'){
-      let {data}=await dbGetProfilesByStatus(status);
-      if(data) profiles=data;
+
+async function loadProfiles(status, btn = null) {
+  currentStatus = status;
+
+  document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+  if (btn) {
+    btn.classList.add('active');
+  } else {
+    const activeBtn = Array.from(document.querySelectorAll('.tab')).find(
+      tab => tab.textContent.toLowerCase().includes(status)
+    );
+    if (activeBtn) activeBtn.classList.add('active');
+  }
+
+  let container = document.getElementById('profilesContainer');
+  container.innerHTML = 'Loading...';
+
+  try {
+    let profiles = [];
+
+    if (status === 'pending') {
+      let res = await dbGetPendingProfiles();
+      if (res.error) throw res.error;
+      profiles = res.data || [];
+    } else {
+      let res = await dbGetProfilesByStatus(status);
+      if (res.error) throw res.error;
+      profiles = res.data || [];
     }
-    let pendingCount=0,approvedCount=0;
-    if(typeof dbGetProfilesByStatus!=='undefined'){
-      let {data:p}=await dbGetProfilesByStatus('pending');
-      let {data:a}=await dbGetProfilesByStatus('approved');
-      pendingCount=p?.length||0;
-      approvedCount=a?.length||0;
+
+    let pendingRes = await dbGetProfilesByStatus('pending');
+    let approvedRes = await dbGetProfilesByStatus('approved');
+
+    if (pendingRes.error) throw pendingRes.error;
+    if (approvedRes.error) throw approvedRes.error;
+
+    let pendingCount = (pendingRes.data || []).length;
+    let approvedCount = (approvedRes.data || []).length;
+
+    document.getElementById('pendingCount').innerText = pendingCount;
+    document.getElementById('approvedCount').innerText = approvedCount;
+
+    if (!profiles.length) {
+      container.innerHTML = `<div class="card"><div class="card-body">No applications found.</div></div>`;
+      return;
     }
-    document.getElementById('pendingCount').innerText=pendingCount;
-    document.getElementById('approvedCount').innerText=approvedCount;
-    if(profiles.length===0){container.innerHTML='<div style="padding:40px;text-align:center">No applications</div>';return;}
-    container.innerHTML=profiles.map(p=>`<div class="card"><div class="card-header"><div><strong>${escapeHtml(p.first_name||'')} ${escapeHtml(p.last_name||'')}</strong><br><small>${escapeHtml(p.email||'')}</small></div><span class="pending-badge">${status==='pending'?'Pending':'Approved'}</span></div><div class="card-body"><div><strong>Story:</strong><br>${escapeHtml((p.story||'').substring(0,150))}</div><div><strong>Social:</strong><br>📸 ${p.ig_followers||0} · 🎵 ${p.tt_followers||0}</div></div>${status==='pending'?`<div class="card-actions"><button class="approve" onclick="updateStatus('${p.user_id}','approved')">✓ Approve</button><button class="reject" onclick="updateStatus('${p.user_id}','rejected')">✗ Reject</button></div>`:''}</div>`).join('');
-  }catch(e){container.innerHTML='Error loading';}
+
+    container.innerHTML = profiles.map(p => `
+      <div class="card">
+        <div class="card-header">
+          <strong>${escapeHtml((p.first_name || '') + ' ' + (p.last_name || ''))}</strong>
+          <span class="pending-badge">${escapeHtml(p.status || '')}</span>
+        </div>
+        <div class="card-body">
+          <div><strong>Title:</strong> ${escapeHtml(p.title || '')}</div>
+          <div><strong>Email:</strong> ${escapeHtml(p.email || '')}</div>
+          <div><strong>City:</strong> ${escapeHtml(p.city || '')}</div>
+          <div><strong>Story:</strong> ${escapeHtml(p.story || '')}</div>
+          <div><strong>Turning Point:</strong> ${escapeHtml(p.turning_pt || '')}</div>
+          <div><strong>Categories:</strong> ${Array.isArray(p.categories) ? p.categories.map(escapeHtml).join(', ') : ''}</div>
+          <div><strong>Talking Points:</strong> ${Array.isArray(p.points) ? p.points.map(escapeHtml).join(', ') : ''}</div>
+          <div><strong>Instagram:</strong> ${escapeHtml(p.ig_handle || '')} ${p.ig_followers ? '(' + escapeHtml(String(p.ig_followers)) + ')' : ''}</div>
+          <div><strong>TikTok:</strong> ${escapeHtml(p.tt_handle || '')} ${p.tt_followers ? '(' + escapeHtml(String(p.tt_followers)) + ')' : ''}</div>
+          <div><strong>YouTube:</strong> ${escapeHtml(p.yt_url || '')} ${p.yt_subs ? '(' + escapeHtml(String(p.yt_subs)) + ')' : ''}</div>
+          <div><strong>LinkedIn:</strong> ${escapeHtml(p.li_url || '')} ${p.li_followers ? '(' + escapeHtml(String(p.li_followers)) + ')' : ''}</div>
+          <div><strong>Availability:</strong> ${escapeHtml(p.availability || '')}</div>
+          <div><strong>Format:</strong> ${escapeHtml(p.format || '')}</div>
+          <div><strong>Podcast Experience:</strong> ${escapeHtml(p.pod_exp || '')}</div>
+          <div><strong>Clip:</strong> ${escapeHtml(p.clip || '')}</div>
+        </div>
+        <div class="card-actions">
+          ${status === 'pending' ? `
+            <button class="approve" onclick="updateStatus('${escapeJs(p.user_id)}', 'approved')">Approve</button>
+            <button class="reject" onclick="updateStatus('${escapeJs(p.user_id)}', 'rejected')">Reject</button>
+          ` : ''}
+        </div>
+      </div>
+    `).join('');
+  } catch (e) {
+    console.error(e);
+    container.innerHTML = 'Error loading profiles';
+  }
 }
-async function updateStatus(id,newStatus){
-  if(!confirm('Are you sure?')) return;
-  try{
-    if(typeof dbUpdateStatus!=='undefined') await dbUpdateStatus(id,newStatus);
+
+async function updateStatus(userId, newStatus) {
+  if (!confirm(`Are you sure you want to mark this profile as ${newStatus}?`)) return;
+
+  try {
+    let res = await dbUpdateStatus(userId, newStatus);
+    if (res.error) throw res.error;
     loadProfiles(currentStatus);
-  }catch(e){alert('Error');}
+  } catch (e) {
+    console.error(e);
+    alert('Error updating profile status');
+  }
 }
-function escapeHtml(str){if(!str)return '';return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function escapeJs(str) {
+  if (!str) return '';
+  return String(str).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+}
 </script>
-</body>
-</html>
