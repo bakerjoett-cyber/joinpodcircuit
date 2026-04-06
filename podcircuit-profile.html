@@ -437,19 +437,30 @@ function doSave(){
   document.getElementById('sInfo').textContent='All changes saved';
   document.getElementById('sInfo').className='saveinfo saved';
 }
-function submitReview(){
+async function submitReview(){
   if(!CU)return;doSave();
   const p=CU.profile;
   if(!p.firstName||!p.story){go('sForm');return toast('Please add your name and story first.','err')}
-  const db=gdb();
   const id='u_'+CU.email.replace(/[^a-z0-9]/gi,'_');
+
+  const payload={
+    ...col(),
+    userId:id,
+    status:'pending'
+  };
+
+  try{
+    const {error}=await dbSaveProfile(payload);
+    if(error) throw error;
+  }catch(e){
+    return toast('Submission failed: '+e.message,'err');
+  }
+
+  const db=gdb();
   db[CU.email].profile.status='pending';
   db[CU.email].profile.id=id;
   db[CU.email].profile.submittedAt=new Date().toISOString();
   sdb(db);CU=db[CU.email];
-  let pq=JSON.parse(localStorage.getItem('podcircuit_pending')||'[]');
-  pq=pq.filter(a=>a.id!==id);pq.push({...CU.profile});
-  localStorage.setItem('podcircuit_pending',JSON.stringify(pq));
   refreshDash();toast('Submitted! We will review within 2-3 days.','ok');
 }
 function refreshDash(){

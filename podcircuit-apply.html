@@ -98,19 +98,18 @@ function validateStep(s) {
 async function submitForm(){
   if(!validateStep(3)) return;
   const data={
-    user_id:'user_'+Date.now(),
-    first_name:document.getElementById('firstName').value,
-    last_name:document.getElementById('lastName').value,
+    userId:'user_'+Date.now(),
+    firstName:document.getElementById('firstName').value,
+    lastName:document.getElementById('lastName').value,
     email:document.getElementById('email').value,
     title:document.getElementById('title').value,
     city:document.getElementById('city').value,
     story:document.getElementById('story').value,
-    ig_followers:parseInt(document.getElementById('igFollowers').value)||0,
-    tt_followers:parseInt(document.getElementById('ttFollowers').value)||0,
+    igF:parseInt(document.getElementById('igFollowers').value)||0,
+    ttF:parseInt(document.getElementById('ttFollowers').value)||0,
     categories:[document.getElementById('category').value],
     points:[document.getElementById('point1').value],
-    status:'pending',
-    submitted_at:new Date().toISOString()
+    status:'pending'
   };
   try{
     if(typeof dbSaveProfile!=='undefined'){

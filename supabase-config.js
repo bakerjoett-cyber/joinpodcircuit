@@ -9,7 +9,7 @@
 const SUPABASE_URL = 'https://bluimgtbmbhjcnuzacfk.supabase.co';
 
 // STEP 2: Paste your "anon public" key below (long string of letters/numbers)
-const SUPABASE_ANON_KEY = 'sb_publishable_tp_thhU8RMpEE6c3lC3flA__WV35HX2
+const SUPABASE_ANON_KEY = 'sb_publishable_tp_thhU8RMpEE6c3lC3flA__WV35HX2';
 // STEP 3: Go to formspree.io → your form → copy the ID from the URL
 // (looks like: formspree.io/f/abcd1234 — just paste the "abcd1234" part)
 const FORMSPREE_ID = 'YOUR_FORMSPREE_ID';
