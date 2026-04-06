@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PodCircuit — Find Your Next Guest</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="supabase-config.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -1224,36 +1226,6 @@ function openJoinModal() {
   window.location.href = 'podcircuit-profile.html';
 }
 
-// ── LOAD APPROVED GUESTS FROM LOCAL STORAGE ──
-function loadApprovedGuests() {
-  try {
-    const stored = JSON.parse(localStorage.getItem('podcircuit_approved') || '[]');
-    stored.forEach(app => {
-      // Convert application format to guest card format
-      const socials = [];
-      const icons = { Instagram:'📸', TikTok:'🎵', YouTube:'▶️', 'X (Twitter)':'🐦', LinkedIn:'💼' };
-      if (app.igFollowers) socials.push({ platform:'Instagram', icon:'📸', followers: fmtNum(app.igFollowers) });
-      if (app.ttFollowers) socials.push({ platform:'TikTok', icon:'🎵', followers: fmtNum(app.ttFollowers) });
-      if (app.ytSubs)      socials.push({ platform:'YouTube', icon:'▶️', followers: fmtNum(app.ytSubs) });
-      if (app.twFollowers) socials.push({ platform:'X (Twitter)', icon:'🐦', followers: fmtNum(app.twFollowers) });
-      if (app.liFollowers) socials.push({ platform:'LinkedIn', icon:'💼', followers: fmtNum(app.liFollowers) });
-      const maxFollowing = Math.max(app.igFollowers||0, app.ttFollowers||0, app.ytSubs||0, app.twFollowers||0, app.liFollowers||0);
-      const fn = app.firstName || ''; const ln = app.lastName || '';
-      guests.unshift({
-        name: fn + ' ' + ln,
-        initials: (fn[0]||'') + (ln[0]||''),
-        title: app.title || '',
-        categories: app.categories || [],
-        story: app.story || '',
-        social: socials,
-        points: app.points || [],
-        availability: app.availability === 'available',
-        followingNum: maxFollowing
-      });
-    });
-  } catch(e) {}
-}
-
 function fmtNum(n) {
   n = parseInt(n);
   if (n >= 1000000) return (n/1000000).toFixed(1).replace(/\.0$/,'') + 'M';
@@ -1261,8 +1233,45 @@ function fmtNum(n) {
   return String(n);
 }
 
+function dbRowToGuest(app) {
+  const socials = [];
+  if (app.ig_followers) socials.push({ platform:'Instagram', icon:'📸', followers: fmtNum(app.ig_followers) });
+  if (app.tt_followers) socials.push({ platform:'TikTok',    icon:'🎵', followers: fmtNum(app.tt_followers) });
+  if (app.yt_subs)      socials.push({ platform:'YouTube',   icon:'▶️', followers: fmtNum(app.yt_subs) });
+  if (app.tw_followers) socials.push({ platform:'X (Twitter)', icon:'🐦', followers: fmtNum(app.tw_followers) });
+  if (app.li_followers) socials.push({ platform:'LinkedIn',  icon:'💼', followers: fmtNum(app.li_followers) });
+  const maxFollowing = Math.max(app.ig_followers||0, app.tt_followers||0, app.yt_subs||0, app.tw_followers||0, app.li_followers||0);
+  const fn = app.first_name || ''; const ln = app.last_name || '';
+  return {
+    name: (fn + ' ' + ln).trim(),
+    initials: ((fn[0]||'') + (ln[0]||'')).toUpperCase(),
+    title: app.title || '',
+    categories: app.categories || [],
+    story: app.story || '',
+    social: socials,
+    points: app.points || [],
+    availability: app.availability === 'available',
+    followingNum: maxFollowing
+  };
+}
+
+async function loadApprovedGuests() {
+  renderCards(guests); // show demo cards immediately while loading
+  try {
+    const { data, error } = await dbGetApprovedProfiles();
+    if (error) throw error;
+    if (data && data.length > 0) {
+      const realGuests = data.map(dbRowToGuest);
+      // prepend real approved guests before demo cards
+      realGuests.reverse().forEach(g => guests.unshift(g));
+      renderCards(guests);
+    }
+  } catch(e) {
+    console.warn('Could not load from Supabase:', e.message);
+  }
+}
+
 loadApprovedGuests();
-renderCards(guests);
 </script>
 </body>
 </html>
