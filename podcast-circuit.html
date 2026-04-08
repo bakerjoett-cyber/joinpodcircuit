@@ -1209,6 +1209,27 @@ function openModal(g) {
   document.getElementById('mPoints').innerHTML = g.points.map(p => `
     <div class="talking-point"><div class="tp-bullet"></div><span>${p}</span></div>
   `).join('');
+
+  const contactBtn = document.querySelector('.btn-contact');
+  if (g.email) {
+    const subject = encodeURIComponent('Podcast Guest Request — PodCircuit');
+    const body = encodeURIComponent(
+      'Hi ' + (g.name.split(' ')[0] || g.name) + ',\n\n' +
+      'I found your profile on PodCircuit and would love to have you as a guest on my podcast.\n\n' +
+      'Could we set up a quick call to discuss?\n\n' +
+      'Looking forward to hearing from you!'
+    );
+    contactBtn.onclick = () => window.location.href = 'mailto:' + g.email + '?subject=' + subject + '&body=' + body;
+    contactBtn.style.opacity = '1';
+    contactBtn.style.cursor = 'pointer';
+    contactBtn.title = 'Send email to ' + g.email;
+  } else {
+    contactBtn.onclick = () => alert('Contact details not available for this guest.');
+    contactBtn.style.opacity = '0.5';
+    contactBtn.style.cursor = 'default';
+    contactBtn.title = '';
+  }
+
   document.getElementById('modalOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
@@ -1251,7 +1272,8 @@ function dbRowToGuest(app) {
     social: socials,
     points: app.points || [],
     availability: app.availability === 'available',
-    followingNum: maxFollowing
+    followingNum: maxFollowing,
+    email: app.email || ''
   };
 }
 
