@@ -128,6 +128,16 @@ async function dbGetProfilesByStatus(status) {
   return { data: data || [], error };
 }
 
+// Delete a profile permanently
+async function dbDeleteProfile(userId) {
+  const db = await getSupabase();
+  const { data, error } = await db
+    .from('guest_profiles')
+    .delete()
+    .eq('user_id', userId);
+  return { data, error };
+}
+
 // Update a profile status (approve / reject)
 async function dbUpdateStatus(userId, status) {
   const db = await getSupabase();

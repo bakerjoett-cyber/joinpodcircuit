@@ -29,6 +29,7 @@
   .approve{background:#27ae60;color:white;border:none;padding:6px 16px;border-radius:6px;cursor:pointer;}
   .reject{background:#c0392b;color:white;border:none;padding:6px 16px;border-radius:6px;cursor:pointer;}
   .pending-badge{background:#fff3e0;color:#c9a84c;padding:4px 12px;border-radius:20px;font-size:0.7rem;}
+  .delete{background:#7f1d1d;color:white;border:none;padding:6px 16px;border-radius:6px;cursor:pointer;}
 </style>
 </head>
 <body>
@@ -90,7 +91,7 @@ async function loadProfiles(status){
     document.getElementById('pendingCount').innerText=pendingCount;
     document.getElementById('approvedCount').innerText=approvedCount;
     if(profiles.length===0){container.innerHTML='<div style="padding:40px;text-align:center">No applications</div>';return;}
-    container.innerHTML=profiles.map(p=>`<div class="card"><div class="card-header"><div><strong>${escapeHtml(p.first_name||'')} ${escapeHtml(p.last_name||'')}</strong><br><small>${escapeHtml(p.email||'')}</small></div><span class="pending-badge">${status==='pending'?'Pending':'Approved'}</span></div><div class="card-body"><div><strong>Story:</strong><br>${escapeHtml((p.story||'').substring(0,150))}</div><div><strong>Social:</strong><br>📸 ${p.ig_followers||0} · 🎵 ${p.tt_followers||0}</div></div>${status==='pending'?`<div class="card-actions"><button class="approve" onclick="updateStatus('${p.user_id}','approved')">✓ Approve</button><button class="reject" onclick="updateStatus('${p.user_id}','rejected')">✗ Reject</button></div>`:''}</div>`).join('');
+    container.innerHTML=profiles.map(p=>`<div class="card"><div class="card-header"><div><strong>${escapeHtml(p.first_name||'')} ${escapeHtml(p.last_name||'')}</strong><br><small>${escapeHtml(p.email||'')}</small></div><span class="pending-badge">${status==='pending'?'Pending':'Approved'}</span></div><div class="card-body"><div><strong>Story:</strong><br>${escapeHtml((p.story||'').substring(0,150))}</div><div><strong>Social:</strong><br>📸 ${p.ig_followers||0} · 🎵 ${p.tt_followers||0}</div></div><div class="card-actions">${status==='pending'?`<button class="approve" onclick="updateStatus('${p.user_id}','approved')">✓ Approve</button><button class="reject" onclick="updateStatus('${p.user_id}','rejected')">✗ Reject</button>`:''}<button class="delete" onclick="deleteProfile('${p.user_id}')">🗑 Delete</button></div></div>`).join('');
   }catch(e){container.innerHTML='Error loading';}
 }
 async function updateStatus(id,newStatus){
@@ -99,6 +100,13 @@ async function updateStatus(id,newStatus){
     if(typeof dbUpdateStatus!=='undefined') await dbUpdateStatus(id,newStatus);
     loadProfiles(currentStatus);
   }catch(e){alert('Error');}
+}
+async function deleteProfile(id){
+  if(!confirm('Permanently delete this profile? This cannot be undone.')) return;
+  try{
+    if(typeof dbDeleteProfile!=='undefined') await dbDeleteProfile(id);
+    loadProfiles(currentStatus);
+  }catch(e){alert('Error deleting profile.');}
 }
 function escapeHtml(str){if(!str)return '';return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 </script>
